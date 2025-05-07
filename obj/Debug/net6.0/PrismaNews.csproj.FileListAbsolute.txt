@@ -1,0 +1,8 @@
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.csproj.AssemblyReference.cache
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.AssemblyInfoInputs.cache
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.AssemblyInfo.cs
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.csproj.CoreCompileInputs.cache
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.RazorAssemblyInfo.cache
+C:\Users\carminati.20133\Desktop\PrismaNews\obj\Debug\net6.0\PrismaNews.RazorAssemblyInfo.cs

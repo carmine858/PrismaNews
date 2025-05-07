@@ -18,16 +18,40 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\carminati.20133\Desktop\PrismaNews
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Analyze.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl6ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/AlternativePerspectives.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcQWx0ZXJuYXRpdmVQZXJzcGVjdGl2ZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/BiasAnalysis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcQmlhc0FuYWx5c2lzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/CommercialInterests.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcQ29tbWVyY2lhbEludGVyZXN0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/MissingInformation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcTWlzc2luZ0luZm9ybWF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/RhetoricalTechniques.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcUmhldG9yaWNhbFRlY2huaXF1ZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/Components/ScientificReferences.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXENvbXBvbmVudHNcU2NpZW50aWZpY1JlZmVyZW5jZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/carminati.20133/Desktop/PrismaNews/Pages/Shared/_ValidationScriptsPartial.cshtml]
