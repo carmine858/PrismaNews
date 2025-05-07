@@ -1,0 +1,50 @@
+﻿@page "{id:int}"
+@model DetailsModel
+@{
+    ViewData["Title"] = "Dettaglio Notizia";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>@Model.Article.Title</h2>
+        <p class="text-muted">
+            <a href="@Model.Article.SourceUrl" target="_blank">@Model.Article.Source</a> -
+            @Model.Article.PublishedDate.ToString("f")
+        </p>
+        <hr />
+        <div class="mb-4">
+            @Model.Article.Content
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h4>Analisi</h4>
+        <div class="accordion" id="analysisAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingBias">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBias" aria-expanded="true" aria-controls="collapseBias">
+                        Bias Rilevati
+                    </button>
+                </h2>
+                <div id="collapseBias" class="accordion-collapse collapse show" aria-labelledby="headingBias" data-bs-parent="#analysisAccordion">
+                    <div class="accordion-body">
+                        @Model.Article.BiasDetection
+                    </div>
+                </div>
+            </div>
+            <!-- Aggiungi altre sezioni per ciascun blocco di analisi -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCounter">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCounter" aria-expanded="false" aria-controls="collapseCounter">
+                        Controargomentazioni
+                    </button>
+                </h2>
+                <div id="collapseCounter" class="accordion-collapse collapse" aria-labelledby="headingCounter" data-bs-parent="#analysisAccordion">
+                    <div class="accordion-body">
+                        @Model.Article.CounterArguments
+                    </div>
+                </div>
+            </div>
+            <!-- ...altre sezioni... -->
+        </div>
+    </div>
+</div>

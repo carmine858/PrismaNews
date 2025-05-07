@@ -1,0 +1,28 @@
+﻿@page
+@model AnalyzeModel
+@{
+    ViewData["Title"] = "Analizza Articolo";
+}
+
+<h1>Analizza un Articolo</h1>
+
+<form method="post" class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Url" class="form-label">URL (facoltativo)</label>
+        <input asp-for="Url" class="form-control" placeholder="https://..." />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Content" class="form-label">Testo Articolo (facoltativo)</label>
+        <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-success">Analizza</button>
+    </div>
+</form>
+
+@if (Model.AnalysisResultAvailable)
+{
+    <hr />
+    <h3>Risultato Analisi</h3>
+    <a asp-page="/Details" asp-route-id="@Model.NewArticleId" class="btn btn-primary mb-3">Visualizza Dettagli</a>
+}

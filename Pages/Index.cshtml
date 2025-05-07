@@ -1,10 +1,23 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1 class="mb-4">Ultime Notizie</h1>
+
+<div class="row">
+    @foreach (var article in Model.Articles)
+    {
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@article.Title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@article.Source - @article.PublishedDate.ToString("g")</h6>
+                    <p class="card-text">@article.Snippet...</p>
+                    <a asp-page="/Details" asp-route-id="@article.Id" class="btn btn-primary">Leggi di più</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>
