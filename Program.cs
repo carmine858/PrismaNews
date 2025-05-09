@@ -1,32 +1,31 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PrismaNews.Data;
-using PrismaNews.services;
 using PrismaNews.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllersWithViews();
+// Aggiungi servizi al container
 builder.Services.AddRazorPages();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure SQLite instead of SQL Server
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-SqliteConfiguration.ConfigureDatabase(builder.Services, connectionString);
+// Configura l'autenticazione
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
 
-// Register HTTP clients
-builder.Services.AddHttpClient<INewsService, NewsApiService>();
-builder.Services.AddHttpClient<Gemini2FlashService>();
-
-// Register application services
-builder.Services.AddScoped<INewsService, NewsApiService>();
-builder.Services.AddScoped<IArticleAnalysisService, Gemini2FlashService>();
-
-// Register repositories
-builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+// Registra il servizio di autenticazione
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configura la pipeline di richiesta HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -35,12 +34,21 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+// Crea il database se non esiste
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    // Commenta la seguente riga se usi le migrazioni
+    // context.Database.EnsureCreated();
+}
 
 app.Run();
