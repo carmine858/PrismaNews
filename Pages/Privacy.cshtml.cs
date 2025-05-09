@@ -16,5 +16,4 @@ namespace PrismaNews.Pages
         {
         }
     }
-
 }
