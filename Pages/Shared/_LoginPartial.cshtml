@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
+
+<ul class="navbar-nav">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <li class="nav-item dropdown user-dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar">
+                    @{
+                        var firstLetter = User.Identity.Name.Substring(0, 1).ToUpper();
+                    }
+                    <span class="avatar-text">@firstLetter</span>
+                </div>
+                <span class="ms-1 d-none d-lg-inline-block">@User.Identity.Name</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li>
+                    <span class="dropdown-item-text">
+                        <strong>@User.Identity.Name</strong><br>
+                        <small class="text-muted">@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value</small>
+                    </span>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                
+                <li><a class="dropdown-item" href="/Users/Favorites"><i class="bi bi-bookmark me-2"></i>Preferiti</a></li>
+                
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form class="form-inline" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
+                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link @(Context.Request.Path == "/Account/Register" ? "active" : "")" href="/Account/Register">Registrati</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-primary btn-sm login-btn" href="/Account/Login">Accedi</a>
+        </li>
+    }
+</ul>

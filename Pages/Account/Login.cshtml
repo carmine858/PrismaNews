@@ -1,0 +1,102 @@
+@page
+@model Prisma.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Accedi";
+    ViewData["HideNavbar"] = true;
+    ViewData["HideFooter"] = true;
+}
+
+<div class="auth-container animate__animated animate__fadeIn">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8 col-sm-10">
+                <div class="auth-card text-center mb-4">
+                    <div class="card-body p-5">
+                        <div class="logo-wrapper mb-4">
+                            <a href="/">
+                                <img src="~/img/prisma-logo.png" width="400" alt="Prisma News Logo" class="auth-logo" onerror="this.src='/img/prisma-logo-fallback.svg'">
+                            </a>
+                        </div>
+
+                        <h2 class="card-title mb-1">Bentornato</h2>
+                        <p class="text-muted mb-4">Accedi per continuare a Prisma News</p>
+
+                        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                        {
+                            <div class="alert @(Model.StatusMessage.StartsWith("Errore") ? "alert-danger" : "alert-success") alert-dismissible fade show" role="alert">
+                                @Model.StatusMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <form id="account" method="post" class="needs-validation" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                            <input type="hidden" asp-for="ReturnUrl" />
+
+                            <div class="form-floating mb-4">
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="nome@esempio.com" required />
+                                <label asp-for="Input.Email">Email</label>
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="Password" required />
+                                <label asp-for="Input.Password">Password</label>
+                                <span class="password-toggle-icon" onclick="togglePasswordVisibility('Input_Password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </span>
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-check mb-4 text-start">
+                                <input asp-for="Input.RememberMe" class="form-check-input" />
+                                <label asp-for="Input.RememberMe" class="form-check-label">Ricordami</label>
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button id="login-submit" type="submit" class="btn btn-primary btn-lg auth-btn">
+                                    <span class="btn-text">Accedi</span>
+                                    <div class="spinner-border spinner-border-sm d-none" role="status">
+                                        <span class="visually-hidden">Caricamento...</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <a href="/Account/ForgotPassword" class="link-secondary">Password dimenticata?</a>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <p>Non hai un account? <a href="/Account/Register" class="link-primary fw-bold">Registrati</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="/" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Torna alla home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Mostra spinner durante il submit
+        document.getElementById('account').addEventListener('submit', function(e) {
+            if (this.checkValidity()) {
+                const button = document.getElementById('login-submit');
+                const buttonText = button.querySelector('.btn-text');
+                const spinner = button.querySelector('.spinner-border');
+
+                buttonText.classList.add('opacity-0');
+                spinner.classList.remove('d-none');
+                button.disabled = true;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,517 @@
+﻿/* Stili avanzati per la Bussola Ideologica - PrismaNews */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --left-color: #2196F3;
+    --right-color: #F44336;
+    --progressive-color: #4CAF50;
+    --conservative-color: #9C27B0;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --hover-transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Card principale con effetto glassmorphism */
+.compass-card {
+    box-shadow: var(--card-shadow);
+    border: none;
+    border-radius: 15px;
+    transition: var(--hover-transition);
+    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    overflow: hidden;
+}
+
+    .compass-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px);
+    }
+
+    .compass-card .card-header {
+        background: linear-gradient(135deg, rgba(248, 249, 250, 0.95) 0%, rgba(233, 236, 239, 0.95) 100%);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem 1.5rem;
+    }
+
+        .compass-card .card-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .compass-card .card-header .badge {
+            background-image: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+/* Layout della bussola */
+.compass-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin: 1.5rem 0;
+}
+
+@media (min-width: 992px) {
+    .compass-container {
+        flex-direction: row;
+    }
+
+    .compass-wrapper {
+        flex: 3;
+        min-height: 550px;
+    }
+
+    .explanation-panel {
+        flex: 2;
+    }
+}
+
+/* Contenitore del grafico con effetti avanzati */
+#compass-chart-container {
+    height: 550px;
+    width: 100%;
+    position: relative;
+    border-radius: 15px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    transition: var(--hover-transition);
+    overflow: hidden;
+}
+
+    #compass-chart-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+canvas#compassChart {
+    max-width: 100%;
+    border-radius: 15px;
+    z-index: 2;
+    position: relative;
+}
+
+/* Logo della bussola */
+.compass-logo {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    top: 15px;
+    right: 15px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='rgba(0,0,0,0.15)' stroke-width='3'/%3E%3Cpath d='M50,5 L50,95 M5,50 L95,50' stroke='rgba(0,0,0,0.1)' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='5' fill='rgba(0,0,0,0.3)'/%3E%3C/svg%3E");
+    background-size: contain;
+    opacity: 0.5;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Effetto glowing per il punto corrente */
+.point-glow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: transparent;
+    box-shadow: 0 0 30px 10px rgba(255, 45, 85, 0.4);
+    animation: pulse 2s infinite ease-in-out;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+}
+
+/* Pannello di spiegazione elegante */
+.explanation-panel {
+    background-color: rgba(248, 249, 250, 0.9);
+    border-radius: 15px;
+    padding: 1.75rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transition: var(--hover-transition);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+    .explanation-panel:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .explanation-panel h4 {
+        margin-bottom: 1.5rem;
+        color: #333;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(233, 236, 239, 0.7);
+        padding-bottom: 0.75rem;
+        font-family: 'Poppins', sans-serif;
+        position: relative;
+    }
+
+        .explanation-panel h4::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-image: linear-gradient(90deg, var(--left-color), var(--progressive-color));
+        }
+
+/* Display delle coordinate con design elegante */
+.coordinates-display {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.coordinate {
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    min-width: 180px;
+    flex: 1;
+    transition: var(--hover-transition);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+    .coordinate::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        opacity: 0;
+        transform: scaleX(0.3);
+        transition: var(--hover-transition);
+    }
+
+    .coordinate:first-child::before {
+        background-image: linear-gradient(90deg, var(--right-color), var(--left-color));
+    }
+
+    .coordinate:last-child::before {
+        background-image: linear-gradient(90deg, var(--conservative-color), var(--progressive-color));
+    }
+
+    .coordinate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+        .coordinate:hover::before {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+    .coordinate span {
+        display: block;
+    }
+
+        .coordinate span:first-child {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .coordinate span.value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .coordinate span.left {
+            color: var(--left-color);
+            background: linear-gradient(90deg, var(--left-color), #64B5F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .coordinate span.right {
+            color: var(--right-color);
+            background: linear-gradient(90deg, var(--right-color), #FF8A65);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .coordinate span.progressive {
+            color: var(--progressive-color);
+            background: linear-gradient(90deg, var(--progressive-color), #81C784);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .coordinate span.conservative {
+            color: var(--conservative-color);
+            background: linear-gradient(90deg, var(--conservative-color), #CE93D8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+/* Blocco di spiegazione con stile moderno */
+.explanation-text {
+    padding: 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: var(--hover-transition);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+    .explanation-text:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .explanation-text blockquote {
+        border-left: 4px solid var(--left-color);
+        padding-left: 1.25rem;
+        margin-bottom: 0;
+        position: relative;
+    }
+
+        .explanation-text blockquote::after {
+            content: """; position: absolute;
+            top: -30px;
+            left: -10px;
+            font-size: 100px;
+            color: rgba(33, 150, 243, 0.07);
+            font-family: Georgia, serif;
+            pointer-events: none;
+        }
+
+        .explanation-text blockquote p {
+            font-style: italic;
+            line-height: 1.8;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 1.05rem;
+            color: #444;
+        }
+
+        .explanation-text blockquote footer {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+/* Tabella delle analisi recenti */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-hover {
+    font-family: 'Poppins', sans-serif;
+}
+
+    .table-hover thead th {
+        background: linear-gradient(135deg, rgba(248, 249, 250, 0.95) 0%, rgba(233, 236, 239, 0.95) 100%);
+        border-top: none;
+        font-weight: 600;
+        color: #444;
+        padding: 1rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.04);
+    }
+
+    .table-hover tbody td {
+        padding: 0.9rem 1rem;
+        vertical-align: middle;
+    }
+
+/* Badge per orientamenti con gradienti */
+.badge.bg-danger {
+    background: linear-gradient(135deg, #F44336 0%, #EF5350 100%) !important;
+    box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%) !important;
+    color: #212529;
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, #0288D1 0%, #4FC3F7 100%) !important;
+    box-shadow: 0 2px 6px rgba(2, 136, 209, 0.3);
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #388E3C 0%, #66BB6A 100%) !important;
+    box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3);
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #616161 0%, #9E9E9E 100%) !important;
+    box-shadow: 0 2px 6px rgba(97, 97, 97, 0.3);
+}
+
+/* Bottoni con effetti avanzati */
+.btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    border-radius: 50px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-outline-primary {
+    border: 2px solid rgba(0, 123, 255, 0.5);
+    color: #0d6efd;
+}
+
+    .btn-outline-primary:hover {
+        background-color: transparent;
+        border-color: #0d6efd;
+        color: #0d6efd;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.2);
+    }
+
+    .btn-outline-primary::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 120%;
+        height: 0;
+        padding-bottom: 120%;
+        background-color: rgba(13, 110, 253, 0.15);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        z-index: -1;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-outline-primary:hover::after {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+.btn-primary {
+    background-image: linear-gradient(135deg, #0d6efd 0%, #3d8bfd 100%);
+    border: none;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
+}
+
+    .btn-primary:hover {
+        background-image: linear-gradient(135deg, #0b5ed7 0%, #3d8bfd 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(13, 110, 253, 0.35);
+    }
+
+.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Animazioni generali */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.compass-container {
+    animation: fadeIn 0.7s ease-out forwards;
+}
+
+.coordinate, .explanation-text {
+    animation: fadeIn 0.9s ease-out forwards;
+}
+
+    .coordinate:nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+/* Media queries responsive */
+@media (max-width: 992px) {
+    .compass-container {
+        flex-direction: column;
+    }
+
+    #compass-chart-container {
+        height: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    .coordinates-display {
+        flex-direction: column;
+    }
+
+    .coordinate {
+        width: 100%;
+    }
+
+    #compass-chart-container {
+        height: 400px;
+        padding: 10px;
+    }
+
+    .point-glow {
+        width: 30px;
+        height: 30px;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+        .card-header .badge {
+            margin-top: 0.75rem;
+        }
+
+    #compass-chart-container {
+        height: 350px;
+    }
+
+    .explanation-text blockquote p {
+        font-size: 0.95rem;
+    }
+}

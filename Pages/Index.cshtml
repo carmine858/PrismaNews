@@ -1,0 +1,771 @@
+﻿
+@page
+@model Prisma.Pages.IndexModel
+@{
+    ViewData["Title"] = "Prisma News - Decostruisci l'informazione";
+}
+
+<!-- Custom CSS for the homepage -->
+<link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/category-section.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<!-- Hero Section -->
+<section class="hero-section animate__animated animate__fadeIn">
+    <div class="container-fluid px-md-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="hero-content">
+                    <h1 class="display-3 fw-bold mb-4">
+                        <span class="text-gradient">Decostruisci</span><br>
+                        l'informazione
+                    </h1>
+                    <p class="lead mb-5">
+                        Trasforma il modo in cui leggi le notizie. Analizza bias, framing e tecniche retoriche con Prisma News, la piattaforma che mette a nudo i meccanismi dell'informazione.
+                    </p>
+                    <div class="search-container mb-5">
+                        <form action="/Analysis/Analyze" method="get">
+                            <div class="input-wrapper">
+                                <i class="bi bi-link-45deg search-icon"></i>
+                                <input type="url" name="ArticleUrl" placeholder="Incolla URL di un articolo da analizzare..."
+                                       class="form-control form-control-lg" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg px-4 analyze-btn">
+                                <span>Analizza</span>
+                                <i class="bi bi-arrow-right-circle ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="prisma-3d">
+                        <div class="prism-container">
+                            <div class="prism">
+                                <div class="prism-face front"></div>
+                                <div class="prism-face back"></div>
+                                <div class="prism-face right"></div>
+                                <div class="prism-face left"></div>
+                                <div class="prism-face top"></div>
+                                <div class="prism-face bottom"></div>
+                            </div>
+                            <div class="light-beam"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading indicator -->
+@if (Model.IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="loader">
+            <div class="loader-prism"></div>
+            <p>Caricamento notizie...</p>
+        </div>
+    </div>
+}
+else if (Model.HasError)
+{
+    <div class="alert alert-danger text-center my-5 container">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @Model.ErrorMessage
+    </div>
+}
+else
+{
+    <!-- Featured News Slider -->
+    @if (Model.FeaturedNews.Any())
+    {
+        <section class="featured-section py-5">
+            <div class="container-fluid px-md-5">
+                <div class="section-title-wrapper mb-4">
+                    <h2 class="section-title">
+                        <i class="bi bi-star-fill section-icon"></i>
+                        <span>In primo piano</span>
+                    </h2>
+                </div>
+
+                <div class="featured-slider">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            @foreach (var article in Model.FeaturedNews)
+                            {
+                                <div class="swiper-slide">
+                                    <div class="featured-card animate__animated" data-animation="animate__fadeIn">
+                                        <div class="row g-0">
+                                            <div class="col-lg-6 featured-image-container">
+                                                <div class="image-wrapper">
+                                                    <img src="@(article.ImageUrl ?? article.GetPlaceholderImage())"
+                                                         alt="@article.Title"
+                                                         onerror="this.src='@article.GetPlaceholderImage()'" />
+                                                </div>
+                                                <span class="category-pill @article.GetSectionColor()">@article.Section</span>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="featured-content">
+                                                    <h3 class="featured-title">@article.Title</h3>
+                                                    <div class="meta-info">
+                                                        <span class="author"><i class="bi bi-person-circle"></i> @article.Author</span>
+                                                        <span class="date"><i class="bi bi-clock"></i> @article.GetTimeAgo()</span>
+                                                    </div>
+                                                    <div class="featured-summary">
+                                                        @Html.Raw(article.Summary)
+                                                    </div>
+                                                    <div class="featured-actions">
+                                                        <!-- Assicurati che questo link punti correttamente alla pagina di analisi -->
+                                                        <!-- Nella card delle notizie, aggiungi questo pulsante -->
+                                                        <a href="/Analysis/Analyze?ArticleId=@article.Id" class="btn btn-primary analyze-btn">
+                                                            <i class="bi bi-layers"></i>
+                                                            <span>Decostruisci</span>
+                                                        </a>
+                                                        <a href="@article.Url" target="_blank" class="btn btn-outline-secondary">
+                                                            <i class="bi bi-box-arrow-up-right"></i> Originale
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Trending News - Layout Ottimizzato -->
+    <section class="trending-section py-5">
+        <div class="container-fluid px-md-5">
+            <div class="section-title-wrapper d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">
+                    <div class="title-icon-wrapper">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <span>Trending Now</span>
+                </h2>
+                <a href="/News/Trending" class="view-all-link">
+                    Vedi tutti <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="trending-layout">
+                <!-- Featured Trending News -->
+                <div class="trending-main">
+                    @{
+                        // Filtrare solo articoli con immagini
+                        var trendingWithImages = Model.TrendingNews.Where(n => !string.IsNullOrEmpty(n.ImageUrl)).ToList();
+                        var firstTrending = trendingWithImages.FirstOrDefault();
+                    }
+
+                    @if (firstTrending != null)
+                    {
+                        <div class="trending-card-xl animate__animated" data-animation="animate__fadeIn">
+                            <div class="card-media">
+                                <img src="@firstTrending.ImageUrl"
+                                     alt="@firstTrending.Title"
+                                     loading="lazy"
+                                     onerror="this.src='/img/trending-placeholder.jpg'" />
+                                <div class="trending-overlay"></div>
+                                <div class="trending-badge">
+                                    <div class="trending-pulse"></div>
+                                    <span>Hot Topic</span>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-category">
+                                    <span class="category-bubble @firstTrending.GetSectionColor()">@firstTrending.Section</span>
+                                    <span class="trend-score">
+                                        <i class="bi bi-graph-up"></i>
+                                        <span class="score-value">@firstTrending.GetTrendingScore()</span>
+                                    </span>
+                                </div>
+                                <h3 class="card-title">@firstTrending.Title</h3>
+                                <p class="card-excerpt">@firstTrending.GetTruncatedSummary(180)</p>
+                                <div class="card-meta">
+                                    <span class="meta-author">
+                                        <i class="bi bi-person-circle"></i> @firstTrending.Author
+                                    </span>
+                                    <span class="meta-date">
+                                        <i class="bi bi-clock"></i> @firstTrending.GetTimeAgo()
+                                    </span>
+                                </div>
+                                <div class="card-actions">
+                                    <!-- Assicurati che questo link punti correttamente alla pagina di analisi -->
+                                    <a href="/Analysis/Analyze?ArticleId=@firstTrending.Id" class="btn btn-primary analyze-btn">
+                                        <i class="bi bi-layers"></i>
+                                        <span>Decostruisci</span>
+                                    </a>
+
+                                    <a href="@(firstTrending?.Url ?? "#")" target="_blank" class="btn btn-outline-light">
+                                        <span>Originale</span>
+                                        <i class="bi bi-box-arrow-up-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Trending placeholder se non ci sono articoli con immagini -->
+                        <div class="trending-card-xl placeholder-trending animate__animated" data-animation="animate__fadeIn">
+                            <div class="card-media">
+                                <img src="/img/trending-placeholder.jpg" alt="Trending news" loading="lazy" />
+                                <div class="trending-overlay"></div>
+                                <div class="trending-badge">
+                                    <div class="trending-pulse"></div>
+                                    <span>Hot Topic</span>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-category">
+                                    <span class="category-bubble bg-primary">World</span>
+                                    <span class="trend-score">
+                                        <i class="bi bi-graph-up"></i>
+                                        <span class="score-value">94%</span>
+                                    </span>
+                                </div>
+                                <h3 class="card-title">Le sfide globali del cambiamento climatico: un nuovo rapporto rivela dati allarmanti</h3>
+                                <p class="card-excerpt">Un nuovo studio pubblicato sulla rivista Nature evidenzia come gli effetti del cambiamento climatico stiano accelerando oltre le previsioni. Gli esperti avvertono sulla necessità di azioni immediate.</p>
+                                <div class="card-meta">
+                                    <span class="meta-author">
+                                        <i class="bi bi-person-circle"></i> Redazione Prisma
+                                    </span>
+                                    <span class="meta-date">
+                                        <i class="bi bi-clock"></i> Oggi
+                                    </span>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="#" class="btn btn-primary analyze-btn">
+                                        <i class="bi bi-layers"></i>
+                                        <span>Decostruisci</span>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-light">
+                                        <span>Originale</span>
+                                        <i class="bi bi-box-arrow-up-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Side Trending News -->
+                <div class="trending-side">
+                    <div class="trending-top">
+                        @{
+                            var secondTrending = trendingWithImages.Skip(1).FirstOrDefault();
+                        }
+
+                        <!-- Secondo articolo trending (orizzontale) -->
+                        <div class="trending-card-horizontal animate__animated" data-animation="animate__fadeIn" data-delay="200">
+                            <div class="trending-rank">2</div>
+                            <div class="card-media">
+                                <img src="@(secondTrending?.ImageUrl ?? "/img/trending-placeholder.jpg")"
+                                     alt="@(secondTrending?.Title ?? "Intelligenza Artificiale: nuovi sviluppi etici")"
+                                     loading="lazy"
+                                     onerror="this.src='/img/trending-placeholder.jpg'" />
+                                <div class="trending-overlay"></div>
+                                <span class="category-bubble small @(secondTrending?.GetSectionColor() ?? "bg-info")">
+                                    @(secondTrending?.Section ?? "Technology")
+                                </span>
+                            </div>
+                            <div class="card-content">
+                                <div class="trend-info">
+                                    <span class="trend-score">
+                                        <i class="bi bi-graph-up"></i> @(secondTrending?.GetTrendingScore() ?? "89%")
+                                    </span>
+                                    <span class="trend-time">
+                                        <i class="bi bi-clock"></i> @(secondTrending?.GetTimeAgo() ?? "3 ore fa")
+                                    </span>
+                                </div>
+                                <h4 class="card-title">@(secondTrending?.Title ?? "Intelligenza Artificiale: nuovi sviluppi etici nelle applicazioni sanitarie")</h4>
+                                <!-- Per Secondary Trending News -->
+                                <a href="/Analysis/Analyze?ArticleId=@secondTrending.Id" class="btn btn-sm btn-primary analyze-btn">
+                                    <i class="bi bi-layers"></i>
+                                    <span>Analizza</span>
+                                </a>
+
+                            </div>
+                        </div>
+
+                        <!-- Terzo articolo trending (orizzontale) -->
+                        <div class="trending-card-horizontal animate__animated" data-animation="animate__fadeIn" data-delay="300">
+                            <div class="trending-rank">3</div>
+                            <div class="card-media">
+                                <img src="@(trendingWithImages.Skip(2).FirstOrDefault()?.ImageUrl ?? "/img/trending-placeholder.jpg")"
+                                     alt="Emergenza climatica: nuovo rapporto evidenzia l'impatto crescente sulla salute globale"
+                                     loading="lazy"
+                                     onerror="this.src='/img/trending-placeholder.jpg'" />
+                                <div class="trending-overlay"></div>
+                                <span class="category-bubble small bg-success">Environment</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="trend-info">
+                                    <span class="trend-score">
+                                        <i class="bi bi-graph-up"></i> 91%
+                                    </span>
+                                    <span class="trend-time">
+                                        <i class="bi bi-clock"></i> 2 ore fa
+                                    </span>
+                                </div>
+                                <h4 class="card-title">Emergenza climatica: nuovo rapporto evidenzia l'impatto crescente sulla salute globale</h4>
+                                <!-- Per Secondary Trending News -->
+                                <a href="/Analysis/Analyze?ArticleId=@secondTrending.Id" class="btn btn-sm btn-primary analyze-btn">
+                                    <i class="bi bi-layers"></i>
+                                    <span>Analizza</span>
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trending-bottom">
+                        <div class="trending-grid-small">
+                            <!-- Articoli trending piccoli (4-7) -->
+                            @for (int i = 0; i < 4; i++)
+                            {
+                                var article = trendingWithImages.Skip(3 + i).FirstOrDefault();
+                                var rank = i + 4;
+                                var delay = 400 + (100 * i);
+
+                                <div class="trending-card-small animate__animated" data-animation="animate__fadeIn" data-delay="@delay">
+                                    <div class="trending-rank">@rank</div>
+                                    <div class="card-media">
+                                        <img src="@(article?.ImageUrl ?? "/img/trending-placeholder.jpg")"
+                                             alt="@(article?.Title ?? $"Trending Article {rank}")"
+                                             loading="lazy"
+                                             onerror="this.src='/img/trending-placeholder.jpg'" />
+                                        <div class="trending-overlay"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <span class="category-label">@(article?.Section ?? "News")</span>
+                                        <h4 class="card-title">@(article?.Title ?? GetPlaceholderTitle(rank))</h4>
+                                        <div class="card-actions">
+                                            <span class="trend-time">
+                                                <i class="bi bi-clock"></i> @(article?.GetTimeAgo() ?? $"{rank} ore fa")
+                                            </span>
+                                            @if (article != null)
+                                            {
+                                                <a href="/Analysis/Analyze?ArticleId=@article.Id" class="analyze-btn-small">
+                                                    <i class="bi bi-layers"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="#" class="analyze-btn-small disabled">
+                                                    <i class="bi bi-layers"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @functions {
+    public string GetPlaceholderTitle(int index)
+    {
+        var titles = new[] {
+            "Nuova scoperta archeologica rivela antiche civiltà nel Mediterraneo",
+            "Progressi significativi nella ricerca sul vaccino contro il cancro",
+            "Summit economico globale: le decisioni che influenzeranno i mercati",
+            "Tecnologia quantistica: il futuro del computing è più vicino"
+        };
+        return titles[(index - 4) % titles.Length];
+    }
+}
+
+
+
+
+    <!-- News By Category - Layout Uniforme e Simmetrico -->
+    <section class="categories-section py-5">
+        <div class="container-fluid px-md-5">
+            <div class="section-title-wrapper d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">
+                    <div class="title-icon-wrapper">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <span>Esplora per categoria</span>
+                </h2>
+            </div>
+
+            <!-- Category Navigation -->
+            <div class="category-nav-container">
+                <div class="category-nav">
+                    <button class="nav-arrow prev-arrow">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <ul class="category-nav-list">
+                        <li class="category-nav-item">
+                            <a href="#" class="category-nav-link active" data-category="all">
+                                <span class="category-icon"><i class="bi bi-grid-3x3-gap"></i></span>
+                                <span class="category-label">Tutte</span>
+                            </a>
+                        </li>
+
+                        @foreach (var category in Model.NewsByCategory.Values)
+                        {
+                            <li class="category-nav-item">
+                                <a href="#" class="category-nav-link" data-category="@category.CategorySlug">
+                                    <span class="category-icon"><i class="bi @category.IconClass"></i></span>
+                                    <span class="category-label">@category.CategoryName</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+
+                    <button class="nav-arrow next-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Content -->
+            <div class="category-content">
+                <!-- All Categories View -->
+                <div class="category-panel active" id="category-all">
+                    <div class="category-grid-layout">
+                        @{
+                            var allCategories = Model.NewsByCategory.Values.ToList();
+                            // Assicuriamoci di avere un multiplo di 2 categorie per la simmetria (aggiungiamo placeholders se necessario)
+                            while (allCategories.Count % 2 != 0)
+                            {
+                                allCategories.Add(new Prisma.Models.NewsCategoryGroup("placeholder") { CategoryName = "Altre categorie", Description = "Scopri altre categorie di notizie", IconClass = "bi-grid-3x3-gap", GradientClass = "category-default" });
+                            }
+                        }
+
+                        @foreach (var (category, index) in allCategories.Select((c, i) => (c, i)))
+                        {
+                            if (category.CategorySlug == "placeholder") continue; // Non mostrare i placeholder reali
+
+                            <div class="category-card animate__animated" data-animation="animate__fadeIn" data-delay="@(index * 100)">
+                                <div class="category-block @category.GradientClass">
+                                    <div class="category-block-header">
+                                        <div class="category-icon-bubble">
+                                            <i class="bi @category.IconClass"></i>
+                                        </div>
+                                        <div class="category-info">
+                                            <h3>@category.CategoryName</h3>
+                                            <p>@category.Description</p>
+                                        </div>
+                                        <button class="category-expander" data-category="@category.CategorySlug">
+                                            <i class="bi bi-arrows-angle-expand"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="articles-grid">
+                                        @foreach (var article in category.Articles.Where(a => !string.IsNullOrEmpty(a.ImageUrl)).Take(4))
+                                        {
+                                            <div class="article-card">
+                                                <div class="article-image-container">
+                                                    <img src="@(article.ImageUrl ?? "/img/placeholder-news.jpg")"
+                                                         alt="@article.Title"
+                                                         loading="lazy"
+                                                         onerror="this.src='/img/placeholder-news.jpg'" />
+                                                    <div></div>
+                                                </div>
+                                                <div class="article-content">
+                                                    <h4 class="article-title">@article.Title</h4>
+                                                    <div class="article-meta">
+                                                        <span class="article-time">@article.GetTimeAgo()</span>
+                                                        <a href="/Analysis/Analyze?ArticleId=@article.Id" class="btn btn-sm btn-primary analyze-btn">
+                                                            <i class="bi bi-layers"></i> Analizza
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="category-footer">
+                                        <button class="btn btn-link category-expand-btn" data-category="@category.CategorySlug">
+                                            Vedi tutti <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Individual Category Panels -->
+                @foreach (var category in Model.NewsByCategory.Values)
+                {
+                    <div class="category-panel" id="category-@category.CategorySlug">
+                        <div class="category-header @category.GradientClass">
+                            <div class="category-icon-large">
+                                <i class="bi @category.IconClass"></i>
+                            </div>
+                            <div class="category-details">
+                                <h2>@category.CategoryName</h2>
+                                <p>@category.Description</p>
+                            </div>
+                        </div>
+
+                        <div class="category-detail-content">
+                            @if (category.Articles.Any(a => !string.IsNullOrEmpty(a.ImageUrl)))
+                            {
+                                <div class="uniform-grid">
+                                    @foreach (var article in category.Articles.Where(a => !string.IsNullOrEmpty(a.ImageUrl)))
+                                    {
+                                        <div class="uniform-card animate__animated" data-animation="animate__fadeIn">
+                                            <div class="card-image-uniform">
+                                                <img src="@(article.ImageUrl ?? "/img/placeholder-news.jpg")"
+                                                     alt="@article.Title"
+                                                     loading="lazy"
+                                                     onerror="this.src='/img/placeholder-news.jpg'" />
+                                                <div class="card-overlay"></div>
+                                                <span class="category-tag @article.GetSectionColor()">@article.Section</span>
+                                            </div>
+                                            <div class="card-content-uniform">
+                                                <h4 class="card-title-uniform">@article.Title</h4>
+                                                <p class="card-excerpt-uniform">@article.GetTruncatedSummary(100)</p>
+                                                <div class="card-footer-uniform">
+                                                    <span class="card-date-uniform">
+                                                        <i class="bi bi-clock"></i> @article.GetTimeAgo()
+                                                    </span>
+                                                    <div class="card-actions-uniform">
+                                                        <a href="/Analysis/Analyze?ArticleId=@article.Id" class="btn btn-sm btn-primary analyze-btn">
+                                                            <i class="bi bi-layers"></i> Analizza
+                                                        </a>
+                                                        <a href="@article.Url" target="_blank" class="btn btn-sm btn-light">
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Aggiungiamo card placeholder per mantenere la simmetria *@
+                                    @{
+                                        var articlesCount = category.Articles.Count(a => !string.IsNullOrEmpty(a.ImageUrl));
+                                        var remainder = articlesCount % 4;
+                                        var placeholdersNeeded = remainder == 0 ? 0 : 4 - remainder;
+                                    }
+
+                                    @for (int i = 0; i < placeholdersNeeded; i++)
+                                    {
+                                        <div class="uniform-card placeholder-card"></div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="no-content-message">
+                                    <i class="bi bi-info-circle"></i>
+                                    <p>Nessun articolo disponibile in questa categoria</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+    <!-- Features Section Ridisegnata -->
+    <section class="features-section py-6">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <div class="section-icon-header">
+                    <div class="icon-circle">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                </div>
+                <h2 class="section-title-large">Perché usare Prisma News</h2>
+                <p class="section-subtitle">Scopri un nuovo modo di leggere e comprendere le notizie</p>
+                <div class="section-divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-icon"><i class="bi bi-diamond-half"></i></span>
+                    <span class="divider-line"></span>
+                </div>
+            </div>
+
+            <div class="features-cards">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="feature-card-new animate__animated" data-animation="animate__fadeInUp">
+                            <div class="feature-icon-new">
+                                <i class="bi bi-shield-exclamation"></i>
+                                <div class="icon-shape"></div>
+                            </div>
+                            <h3>Analisi Bias Cognitivi</h3>
+                            <p>Identifica automaticamente pregiudizi, inclinazioni politiche ed emotive nascoste nel testo attraverso algoritmi di intelligenza artificiale avanzati.</p>
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle"></i> Rilevamento di 14 tipi di bias</li>
+                                <li><i class="bi bi-check-circle"></i> Analisi dell'orientamento politico</li>
+                                <li><i class="bi bi-check-circle"></i> Confronto con fonti multiple</li>
+                            </ul>
+                           
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="feature-card-new animate__animated" data-animation="animate__fadeInUp" data-delay="200">
+                            <div class="feature-icon-new">
+                                <i class="bi bi-window-stack"></i>
+                                <div class="icon-shape"></div>
+                            </div>
+                            <h3>Framing Detector</h3>
+                            <p>Rivela come la struttura narrativa delle notizie influenza la percezione degli eventi, evidenziando le cornici interpretative utilizzate dai media.</p>
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle"></i> Analisi dei frame narrativi</li>
+                                <li><i class="bi bi-check-circle"></i> Identificazione di metafore guida</li>
+                                <li><i class="bi bi-check-circle"></i> Visualizzazione delle prospettive</li>
+                            </ul>
+                           
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="feature-card-new animate__animated" data-animation="animate__fadeInUp" data-delay="400">
+                            <div class="feature-icon-new">
+                                <i class="bi bi-chat-quote"></i>
+                                <div class="icon-shape"></div>
+                            </div>
+                            <h3>Tecniche Retoriche</h3>
+                            <p>Individua e spiega le strategie di persuasione e le figure retoriche utilizzate per influenzare l'opinione del lettore e costruire argomenti convincenti.</p>
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle"></i> Riconoscimento di 20+ tecniche</li>
+                                <li><i class="bi bi-check-circle"></i> Analisi dell'efficacia persuasiva</li>
+                                <li><i class="bi bi-check-circle"></i> Spiegazione dettagliata di ogni tecnica</li>
+                            </ul>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-callout">
+                <div class="callout-content">
+                    <div class="callout-icon">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <div class="callout-text">
+                        <h3>Pensiero critico potenziato dall'intelligenza artificiale</h3>
+                        <p>Costruisci la tua comprensione autonoma dei fatti con strumenti che aumentano la consapevolezza, non algoritmi che decidono per te.</p>
+                    </div>
+                    <a href="/" class="btn btn-lg btn-primary">
+                        <i class="bi bi-play-circle me-2"></i> Prova la demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- CTA Section -->
+    <section class="cta-section py-5">
+        <div class="container">
+            <div class="cta-card">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h2>Diventa un lettore consapevole</h2>
+                        <p>Registrati gratuitamente e accedi a statistiche personalizzate, salva le tue analisi e segui l'evoluzione del panorama informativo</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                        <a href="/Account/Register" class="btn btn-light btn-lg">
+                            <i class="bi bi-person-plus"></i> Inizia ora
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script src="~/js/newsInteraction.js" asp-append-version="true"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Swiper for Featured News
+            const featuredSwiper = new Swiper('.featured-slider .swiper-container', {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+
+                document.addEventListener('DOMContentLoaded', function() {
+            // Trova tutti i bottoni "Vedi tutti"
+            var expandButtons = document.querySelectorAll('.category-expand-btn');
+
+            // Aggiungi event listener per ogni bottone
+            expandButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var categorySlug = this.getAttribute('data-category');
+                    if (categorySlug) {
+                        window.location.href =  categorySlug;
+                    }
+                });
+            });
+        });
+            // Animation on scroll
+            const animateElements = document.querySelectorAll('.animate__animated');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const animation = entry.target.getAttribute('data-animation');
+                        const delay = entry.target.getAttribute('data-delay');
+
+                        if (animation) {
+                            entry.target.classList.add(animation);
+                            if (delay) {
+                                entry.target.style.animationDelay = `${delay}ms`;
+                            }
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            animateElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            // Toggle category views
+            const viewAllLinks = document.querySelectorAll('.view-all-link');
+            viewAllLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const targetTab = document.querySelector(this.getAttribute('data-bs-target') + '-tab');
+                    if (targetTab) {
+                        targetTab.click();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+}

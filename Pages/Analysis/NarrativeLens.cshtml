@@ -1,0 +1,272 @@
+﻿@page
+@model Prisma.Pages.Analysis.NarrativeLensModel
+@{
+    ViewData["Title"] = "Narrative Lens";
+}
+
+<div class="narrative-lens-container">
+    <header class="lens-header">
+        <h1 class="display-4">
+            <i class="bi bi-camera-fill"></i> Narrative Lens
+            <small class="text-muted">Prospettive diverse sulla stessa notizia</small>
+        </h1>
+
+        @if (Model.NarrativeLens != null)
+        {
+            <h2 class="original-title">@Model.NarrativeLens.OriginalTitle</h2>
+        }
+    </header>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+        </div>
+    }
+    else if (Model.IsLoading)
+    {
+        <div class="loading-container">
+            <div class="loading-animation">
+                <div class="lens-circle"></div>
+                <div class="lens-reflection"></div>
+            </div>
+            <p>Generazione delle prospettive in corso...</p>
+            <small>Questa operazione potrebbe richiedere fino a 30 secondi</small>
+        </div>
+    }
+    else if (Model.NarrativeLens?.Perspectives?.Any() == true)
+    {
+        <div class="lens-navigation">
+            <button type="button" class="lens-nav-btn lens-prev-btn" aria-label="Precedente">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <div class="lens-indicators">
+                @foreach (var perspective in Model.NarrativeLens.Perspectives)
+                {
+                    <button type="button" class="lens-indicator" data-perspective-type="@perspective.Type.ToString().ToLower()" aria-label="@perspective.Name">
+                        <span class="lens-emoji">@perspective.Emoji</span>
+                        <span class="lens-name">@perspective.Name</span>
+                    </button>
+                }
+            </div>
+
+            <button type="button" class="lens-nav-btn lens-next-btn" aria-label="Successivo">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="lens-carousel-container">
+            <div class="lens-carousel">
+                @foreach (var perspective in Model.NarrativeLens.Perspectives)
+                {
+                    <div class="lens-slide" data-perspective-type="@perspective.Type.ToString().ToLower()">
+                        <div class="lens-content">
+                            <div class="lens-header" style="background: @Model.GetBackgroundColor(perspective.Type)">
+                                <div class="lens-badge">
+                                    <span class="lens-emoji">@perspective.Emoji</span>
+                                    <span class="lens-name">@perspective.Name</span>
+                                </div>
+                                <h3 class="lens-title">@perspective.Title</h3>
+                                <p class="lens-summary">@perspective.Summary</p>
+
+                                <div class="lens-keywords">
+                                    @foreach (var keyword in perspective.Keywords)
+                                    {
+                                        <span class="lens-keyword">@keyword</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="lens-body">
+                                <div class="lens-article">
+                                    @Html.Raw(Model.FormatContent(perspective.Content))
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="lens-footer">
+            <a href="@Url.Page("/Analysis/Analyze", new { articleId = Model.ArticleId })" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Torna all'analisi completa
+            </a>
+
+            <div class="lens-share">
+                <button type="button" class="btn btn-primary share-btn">
+                    <i class="bi bi-share-fill"></i> Condividi
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-camera"></i>
+            </div>
+            <p>Seleziona un articolo per visualizzare diverse prospettive narrative.</p>
+            <a href="/" class="btn btn-primary">Sfoglia articoli</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.querySelector('.lens-carousel');
+            const slides = document.querySelectorAll('.lens-slide');
+            const indicators = document.querySelectorAll('.lens-indicator');
+            const prevBtn = document.querySelector('.lens-prev-btn');
+            const nextBtn = document.querySelector('.lens-next-btn');
+
+            let currentIndex = 0;
+            const slideCount = slides.length;
+
+            // Initialize
+            updateCarousel();
+
+            // Event listeners
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateCarousel();
+                });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                updateCarousel();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % slideCount;
+                updateCarousel();
+            });
+
+            // Support for keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                    updateCarousel();
+                } else if (e.key === 'ArrowRight') {
+                    currentIndex = (currentIndex + 1) % slideCount;
+                    updateCarousel();
+                }
+            });
+
+            // Support for touch swipe
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            carousel.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            carousel.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                const threshold = 50;
+                if (touchEndX < touchStartX - threshold) {
+                    // Swipe left
+                    currentIndex = (currentIndex + 1) % slideCount;
+                    updateCarousel();
+                } else if (touchEndX > touchStartX + threshold) {
+                    // Swipe right
+                    currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                    updateCarousel();
+                }
+            }
+
+            function updateCarousel() {
+                // Update slides position
+                const translateX = -currentIndex * 100;
+                carousel.style.transform = `translateX(${translateX}%)`;
+
+                // Update indicators
+                indicators.forEach((indicator, index) => {
+                    if (index === currentIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+
+                // Update navigation buttons
+                prevBtn.disabled = slideCount <= 1;
+                nextBtn.disabled = slideCount <= 1;
+
+                // Add perspective-specific class to body
+                const currentSlide = slides[currentIndex];
+                const perspectiveType = currentSlide.dataset.perspectiveType;
+
+                document.body.className = document.body.className.replace(/perspective-\w+/g, '');
+                document.body.classList.add(`perspective-${perspectiveType}`);
+
+                // Trigger animation for current slide
+                slides.forEach((slide, index) => {
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                    } else {
+                        slide.classList.remove('active');
+                    }
+                });
+            }
+
+            // Share functionality
+            const shareBtn = document.querySelector('.share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', async () => {
+                    const url = window.location.href;
+                    const title = "Narrative Lens - PrismaNews";
+
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({
+                                title,
+                                url
+                            });
+                        } else {
+                            // Fallback for browsers that don't support Web Share API
+                            navigator.clipboard.writeText(url);
+
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'share-tooltip';
+                            tooltip.textContent = 'Link copiato negli appunti!';
+                            shareBtn.appendChild(tooltip);
+
+                            setTimeout(() => {
+                                tooltip.remove();
+                            }, 2000);
+                        }
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                    }
+                });
+            }
+
+            // Parallax effect for lens header
+            const lensHeaders = document.querySelectorAll('.lens-header');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                lensHeaders.forEach(header => {
+                    const speed = 0.5;
+                    header.style.transform = `translateY(${scrollTop * speed}px)`;
+                });
+            }, { passive: true });
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/narrative-lens.css" asp-append-version="true" />
+}
+
+@section PageScripts {
+    <script src="~/js/narrative-lens.js" asp-append-version="true"></script>
+}

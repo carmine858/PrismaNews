@@ -1,0 +1,404 @@
+:root {
+    --primary-color: #4361ee;
+    --primary-color-dark: #3a0ca3;
+    --secondary-color: #4cc9f0;
+    --accent-color: #f72585;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --gray-color: #6c757d;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: 'Poppins', var(--font-main);
+    --navbar-height: 70px;
+    --navbar-height-mobile: 60px;
+    --footer-height: 80px;
+    --card-border-radius: 1rem;
+    --btn-border-radius: 0.5rem;
+    --input-border-radius: 0.5rem;
+}
+/* Reset generale per tutti i bottoni nella homepage */
+body .btn,
+body button,
+body a.btn,
+body [role="button"] {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    user-select: auto !important;
+}
+
+/* Assicurati che i contenitori non blocchino i click */
+.container, .row, .col, .card, .card-body {
+    pointer-events: auto;
+}
+html {
+    position: relative;
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding-top: calc(var(--navbar-height) + 20px);
+    font-family: var(--font-main);
+    background-color: #f5f7ff;
+    color: var(--dark-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+/* Navbar Styling */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    min-height: var(--navbar-height);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white !important;
+}
+
+.brand-text {
+    margin-left: 8px;
+    background: linear-gradient(45deg, #fff, #e0e0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+}
+
+.navbar-nav .nav-link {
+    padding: 0.7rem 1rem;
+    margin: 0 0.15rem;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+    .navbar-nav .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 10%;
+        background-color: #fff;
+        transition: width 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover::after,
+    .navbar-nav .nav-link.active::after {
+        width: 80%;
+    }
+
+.login-btn {
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    margin-left: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+    .login-btn:hover {
+        background: white;
+        color: var(--primary-color) !important;
+        transform: translateY(-2px);
+    }
+
+/* User dropdown styling */
+.user-dropdown .dropdown-menu {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 0;
+    min-width: 240px;
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-dropdown .dropdown-item {
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s;
+}
+
+    .user-dropdown .dropdown-item:active,
+    .user-dropdown .dropdown-item:hover {
+        background-color: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+    }
+
+/* Footer styling */
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    color: #212529;
+    margin-top: 2rem;
+}
+
+    .footer h5, .footer h6 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .footer .nav-link {
+        padding: 0.3rem 0;
+    }
+
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+    .social-links a:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Authentication pages styling */
+.auth-card {
+    border: none;
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .auth-card .card-header {
+        background: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+.auth-logo {
+    height: 60px;
+    transition: transform 0.3s ease;
+}
+
+    .auth-logo:hover {
+        transform: scale(1.05);
+    }
+
+.auth-btn {
+    position: relative;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+    .auth-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+    }
+
+.btn-text {
+    transition: opacity 0.3s ease;
+}
+
+/* Form controls */
+.form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+    .form-floating > .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary-color);
+    }
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+/* Password toggle icon */
+.password-toggle-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    cursor: pointer;
+    color: var(--gray-color);
+    transition: color 0.2s ease;
+}
+
+    .password-toggle-icon:hover {
+        color: var(--primary-color);
+    }
+
+.form-floating .password-toggle-icon {
+    top: calc(50% - 0.25rem);
+    right: 12px;
+}
+
+/* Password strength meter */
+.password-strength .progress {
+    height: 5px;
+    border-radius: 5px;
+}
+
+.password-strength .progress-bar {
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* Theme switcher */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.theme-icon {
+    color: white;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+    .theme-icon.active {
+        opacity: 1;
+    }
+
+/* Special containers */
+.login-container, .register-container, .logout-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Logout page specific */
+.logout-icon {
+    font-size: 3rem;
+    color: var(--danger-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    body {
+        padding-top: calc(var(--navbar-height-mobile) + 20px);
+    }
+
+    .navbar {
+        min-height: var(--navbar-height-mobile);
+    }
+
+    .navbar-collapse {
+        background-color: var(--primary-color);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-card {
+        margin: 0 15px;
+    }
+
+    .footer {
+        text-align: center;
+    }
+
+    .social-links, .footer-links {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+}
+
+/* Utility classes */
+.animate__animated {
+    animation-duration: 0.5s !important;
+}
+
+/* For Bootstrap form validation */
+.was-validated .form-control:valid, .form-control.is-valid {
+    border-color: var(--success-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+}
+
+.was-validated .form-control:invalid, .form-control.is-invalid {
+    border-color: var(--danger-color);
+}
+/* Stile per il body quando non c'è la navbar */
+body.no-navbar {
+    padding-top: 0;
+}
+
+/* Stile specifico per le pagine di autenticazione senza navbar */
+.no-navbar .auth-container {
+    margin-top: 3rem;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+}
+
+.no-navbar .auth-card {
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+/* Migliorato il logo nelle pagine di autenticazione */
+.no-navbar .auth-logo {
+    height: 80px;
+    margin-bottom: 1.5rem;
+}

@@ -1,0 +1,1028 @@
+﻿@page
+@model Prisma.Pages.Analysis.AnalyzeModel
+@{
+    ViewData["Title"] = "Analisi - " + (Model.Article?.Title ?? "Articolo");
+}
+
+<link rel="stylesheet" href="~/css/analysis.css" asp-append-version="true" />
+
+<div class="analysis-wrapper">
+    @if (Model.IsLoading)
+    {
+        <!-- Loading State -->
+        <div class="analysis-loading">
+            <div class="prisma-effect">
+                <div class="prism">
+                    <div class="face front"></div>
+                    <div class="face back"></div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+                    <div class="light-beam"></div>
+                </div>
+            </div>
+            <h2 class="loading-title">Analisi in corso</h2>
+            <div class="progress-steps">
+                <div class="step @(Model.CurrentStep >= Prisma.Pages.Analysis.AnalyzeModel.AnalysisStep.FetchingArticle ? "active" : "")">
+                    <div class="step-circle"><i class="bi bi-newspaper"></i></div>
+                    <div class="step-label">Recupero articolo</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="step @(Model.CurrentStep >= Prisma.Pages.Analysis.AnalyzeModel.AnalysisStep.ScrapingContent ? "active" : "")">
+                    <div class="step-circle"><i class="bi bi-file-text"></i></div>
+                    <div class="step-label">Estrazione contenuto</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="step @(Model.CurrentStep >= Prisma.Pages.Analysis.AnalyzeModel.AnalysisStep.AnalyzingContent ? "active" : "")">
+                    <div class="step-circle"><i class="bi bi-braces"></i></div>
+                    <div class="step-label">Analisi AI</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="step @(Model.CurrentStep >= Prisma.Pages.Analysis.AnalyzeModel.AnalysisStep.Complete ? "active" : "")">
+                    <div class="step-circle"><i class="bi bi-check-circle"></i></div>
+                    <div class="step-label">Completato</div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <!-- Error State -->
+        <div class="analysis-error">
+            <div class="error-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h2>Si è verificato un errore</h2>
+            <p>@Model.ErrorMessage</p>
+            <a href="/" class="btn btn-primary">Torna alla homepage</a>
+        </div>
+    }
+    else
+    {
+        <!-- Article Header -->
+        <div class="article-header">
+            <div class="header-backdrop"></div>
+            <div class="article-meta">
+                <div class="source-info">
+                    <div class="source-badge">
+                        <i class="bi bi-newspaper"></i>
+                        <span>@Model.Analysis.Source</span>
+                    </div>
+                    <div class="category-badge category-@Model.Analysis.Category.ToLower()">
+                        <i class="bi bi-bookmark-fill"></i>
+                        <span>@Model.Analysis.Category</span>
+                    </div>
+                    <div class="date-badge">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>@Model.Article.PublicationDate.ToString("d MMMM yyyy")</span>
+                    </div>
+                </div>
+                <div class="scores-dashboard">
+                    <div class="score-item score-bias @Model.Analysis.GetBiasClass()">
+                        <div class="score-label">Bias</div>
+                        <div class="score-chart">
+                            <div class="chart-ring">
+                                <svg viewBox="0 0 36 36">
+                                    <path class="circle-bg"
+                                          d="M18 2.0845
+                             a 15.9155 15.9155 0 0 1 0 31.831
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle-progress"
+                                          stroke-dasharray="@Model.Analysis.Scores.BiasScore, 100"
+                                          d="M18 2.0845
+                             a 15.9155 15.9155 0 0 1 0 31.831
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="score-value">@Model.Analysis.Scores.BiasScore<span>%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-item score-persuasion @Model.Analysis.GetPersuasionClass()">
+                        <div class="score-label">Persuasione</div>
+                        <div class="score-chart">
+                            <div class="chart-ring">
+                                <svg viewBox="0 0 36 36">
+                                    <path class="circle-bg"
+                                          d="M18 2.0845
+                             a 15.9155 15.9155 0 0 1 0 31.831
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle-progress"
+                                          stroke-dasharray="@Model.Analysis.Scores.PersuasionScore, 100"
+                                          d="M18 2.0845
+                             a 15.9155 15.9155 0 0 1 0 31.831
+                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="score-value">@Model.Analysis.Scores.PersuasionScore<span>%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.Analysis.Scores.ComplexityScore > 0)
+                    {
+                        <div class="score-item score-complexity">
+                            <div class="score-label">Complessità</div>
+                            <div class="score-chart">
+                                <div class="chart-ring">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="circle-bg"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle-progress"
+                                              stroke-dasharray="@Model.Analysis.Scores.ComplexityScore, 100"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <div class="score-value">@Model.Analysis.Scores.ComplexityScore<span>%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.Analysis.Scores.FactualAccuracyScore > 0)
+                    {
+                        <div class="score-item score-accuracy">
+                            <div class="score-label">Accuratezza</div>
+                            <div class="score-chart">
+                                <div class="chart-ring">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="circle-bg"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle-progress"
+                                              stroke-dasharray="@Model.Analysis.Scores.FactualAccuracyScore, 100"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <div class="score-value">@Model.Analysis.Scores.FactualAccuracyScore<span>%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.Analysis.Scores.BalanceScore > 0)
+                    {
+                        <div class="score-item score-balance">
+                            <div class="score-label">Equilibrio</div>
+                            <div class="score-chart">
+                                <div class="chart-ring">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="circle-bg"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle-progress"
+                                              stroke-dasharray="@Model.Analysis.Scores.BalanceScore, 100"
+                                              d="M18 2.0845
+                                 a 15.9155 15.9155 0 0 1 0 31.831
+                                 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <div class="score-value">@Model.Analysis.Scores.BalanceScore<span>%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="article-title-container">
+                <h1 class="article-title">@Model.Article.Title</h1>
+                @if (!string.IsNullOrEmpty(Model.Analysis.Summary))
+                {
+                    <div class="article-summary">
+                        <div class="summary-icon"><i class="bi bi-quote"></i></div>
+                        <blockquote>@Model.Analysis.Summary</blockquote>
+                    </div>
+                }
+            </div>
+
+            <div class="article-actions">
+                <a href="@Model.Article.Url" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Leggi originale</span>
+                </a>
+                <a href="@Url.Page("/Analysis/IdeologicalCompass", new { articleId = Model.Article.Id })" class="btn btn-outline-primary">
+                    <i class="bi bi-compass"></i>
+                    <span>Analizza ideologia</span>
+                </a>
+
+                <a href="@Url.Page("/Analysis/NarrativeLens", new { articleId = Model.Article.Id })"
+                   class="btn btn-outline-primary lens-btn">
+                    <i class="bi bi-camera-fill"></i> Narrative Lens
+                </a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                <form method="post" asp-page-handler="SaveAnalysis" class="d-inline">
+                    <input type="hidden" name="articleId" value="@Model.Article.Id" />
+                    <input type="hidden" name="articleTitle" value="@Model.Article.Title" />
+                    <input type="hidden" name="articleUrl" value="@Model.Article.Url" />
+                    <button type="submit" class="btn btn-outline-primary" id="saveAnalysisBtn">
+                        <i class="bi bi-bookmark"></i>
+                        <span>Salva nei preferiti</span>
+                    </button>
+                </form>
+                }
+                else
+                {
+                <button class="btn btn-outline-primary" onclick="showLoginToSaveMessage()">
+                    <i class="bi bi-bookmark"></i>
+                    <span>Salva nei preferiti</span>
+                </button>
+                }
+
+                <div class="share-dropdown dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-share-fill"></i>
+                        <span>Condividi</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareAnalysis('twitter')">
+                                <i class="bi bi-twitter"></i> Twitter
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareAnalysis('facebook')">
+                                <i class="bi bi-facebook"></i> Facebook
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareAnalysis('whatsapp')">
+                                <i class="bi bi-whatsapp"></i> WhatsApp
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareAnalysis('copy')">
+                                <i class="bi bi-clipboard"></i> Copia link
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Toast per messaggi di salvataggio -->
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong class="me-auto">PrismaNews</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        @if (!string.IsNullOrEmpty(Model.SaveMessage))
+                        {
+                            @Model.SaveMessage
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="analysis-navigation">
+            <ul class="nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Panoramica</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="bias-tab" data-bs-toggle="tab" data-bs-target="#bias" type="button" role="tab">
+                        <i class="bi bi-shield-exclamation"></i>
+                        <span>Bias</span>
+                        <div class="indicator @Model.Analysis.GetBiasClass()"></div>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="framing-tab" data-bs-toggle="tab" data-bs-target="#framing" type="button" role="tab">
+                        <i class="bi bi-bounding-box"></i>
+                        <span>Framing</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="rhetoric-tab" data-bs-toggle="tab" data-bs-target="#rhetoric" type="button" role="tab">
+                        <i class="bi bi-chat-quote"></i>
+                        <span>Retorica</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="alternatives-tab" data-bs-toggle="tab" data-bs-target="#alternatives" type="button" role="tab">
+                        <i class="bi bi-shuffle"></i>
+                        <span>Alternative</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sources-tab" data-bs-toggle="tab" data-bs-target="#sources" type="button" role="tab">
+                        <i class="bi bi-journal-check"></i>
+                        <span>Fonti</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content analysis-content">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="analysis-grid">
+                    <!-- Primary Framing Card -->
+                    <div class="analysis-card framing-overview">
+                        <div class="card-header">
+                            <div class="header-icon">
+                                <i class="bi bi-window"></i>
+                            </div>
+                            <h2>Framing principale</h2>
+                            <div class="info-tooltip" data-bs-toggle="tooltip" title="Il modo in cui l'articolo 'incornicia' il tema, enfatizzando certi aspetti e minimizzandone altri">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="framing-bubble">
+                                <div class="framing-content">
+                                    <p>@Model.Analysis.PrimaryFraming</p>
+                                </div>
+                            </div>
+
+                            <h3 class="key-terms-title">
+                                <i class="bi bi-tags-fill"></i> Termini chiave
+                            </h3>
+
+                            <div class="key-terms-analysis">
+                                @if (Model.Analysis.KeyTermsAnalysis != null && Model.Analysis.KeyTermsAnalysis.Any())
+                                {
+                                    @foreach (var term in Model.Analysis.KeyTermsAnalysis)
+                                    {
+                                        <div class="key-term-item">
+                                            <span class="term-tag">@term.Term</span>
+                                            @if (!string.IsNullOrEmpty(term.Analysis))
+                                            {
+                                                <div class="term-analysis">@term.Analysis</div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                                else if (Model.Analysis.KeyTerms != null && Model.Analysis.KeyTerms.Any())
+                                {
+                                    <div class="key-terms-cloud">
+                                        @foreach (var term in Model.Analysis.KeyTerms)
+                                        {
+                                            <span class="term-tag">@term</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="no-data-message">
+                                        <i class="bi bi-info-circle"></i>
+                                        <p>Nessun termine chiave identificato</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bias Overview Card -->
+                    <div class="analysis-card bias-overview">
+                        <div class="card-header">
+                            <div class="header-icon">
+                                <i class="bi bi-shield-exclamation"></i>
+                            </div>
+                            <h2>Principali bias rilevati</h2>
+                            <div class="info-tooltip" data-bs-toggle="tooltip" title="Pregiudizi cognitivi che possono influenzare la percezione dell'informazione">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Analysis.Biases != null && Model.Analysis.Biases.Any())
+                            {
+                                <div class="bias-list">
+                                    @foreach (var bias in Model.Analysis.Biases.Take(2))
+                                    {
+                                        <div class="bias-item @bias.GetSeverityClass()">
+                                            <div class="bias-name-container">
+                                                <h3 class="bias-name">@bias.Type</h3>
+                                                <div class="bias-severity">
+                                                    <span class="severity-label">Intensità</span>
+                                                    <span class="severity-value">@bias.Severity%</span>
+                                                </div>
+                                            </div>
+                                            <p class="bias-description">@bias.Description</p>
+                                            <div class="severity-bar-container">
+                                                <div class="severity-bar">
+                                                    <div class="severity-fill" style="width: @(bias.Severity)%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (Model.Analysis.Biases.Count > 2)
+                                    {
+                                        <button class="show-more-btn" onclick="document.getElementById('bias-tab').click(); return false;">
+                                            <i class="bi bi-plus-circle"></i>
+                                            <span>Mostra tutti (@Model.Analysis.Biases.Count)</span>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="no-data">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <p>Nessun bias significativo rilevato</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Rhetoric Card -->
+                    <div class="analysis-card rhetoric-overview">
+                        <div class="card-header">
+                            <div class="header-icon">
+                                <i class="bi bi-chat-quote"></i>
+                            </div>
+                            <h2>Tecniche retoriche</h2>
+                            <div class="info-tooltip" data-bs-toggle="tooltip" title="Strategie linguistiche utilizzate per persuadere o influenzare il lettore">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Analysis.RhetoricTechniques != null && Model.Analysis.RhetoricTechniques.Any())
+                            {
+                                <div class="rhetoric-techniques">
+                                    @foreach (var technique in Model.Analysis.RhetoricTechniques.Take(2))
+                                    {
+                                        <div class="technique-card">
+                                            <div class="technique-icon">
+                                                <i class="@GetTechniqueIcon(technique.Name)"></i>
+                                            </div>
+                                            <div class="technique-content">
+                                                <h3 class="technique-name">@technique.Name</h3>
+                                                <p class="technique-description">@technique.Description</p>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (Model.Analysis.RhetoricTechniques.Count > 2)
+                                    {
+
+                                        <button class="show-more-btn" onclick="document.getElementById('bias-tab').click(); return false;">
+                                            <i class="bi bi-plus-circle"></i>
+                                            <span>Mostra tutte (@Model.Analysis.RhetoricTechniques.Count)</span>
+                                        </button>
+
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="no-data">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <p>Nessuna tecnica retorica significativa rilevata</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Overall Assessment -->
+                    <div class="analysis-card assessment">
+                        <div class="card-header">
+                            <div class="header-icon">
+                                <i class="bi bi-lightbulb-fill"></i>
+                            </div>
+                            <h2>Valutazione complessiva</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="assessment-container">
+                                <div class="assessment-decoration">
+                                    <div class="quote-icon"><i class="bi bi-quote"></i></div>
+                                </div>
+                                <p class="assessment-text">@Model.Analysis.OverallAssessment</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bias Tab -->
+            <div class="tab-pane fade" id="bias" role="tabpanel">
+                <!-- Bias tab content -->
+                <div class="bias-explainer">
+                    <div class="explainer-icon"><i class="bi bi-info-circle"></i></div>
+                    <div class="explainer-content">
+                        <h2>Cosa sono i bias cognitivi?</h2>
+                        <p>I bias cognitivi sono "scorciatoie mentali" che influenzano il nostro modo di percepire, interpretare e ricordare informazioni. Nei media, questi bias possono influenzare significativamente come vengono presentate e percepite le notizie.</p>
+                    </div>
+                </div>
+
+                <!-- Bias visualization -->
+                <div class="bias-visualization">
+                    @if (Model.Analysis.Biases != null && Model.Analysis.Biases.Any())
+                    {
+                        <div class="bias-radar">
+                            <div class="radar-center">
+                                <span>Articolo</span>
+                            </div>
+
+                            @{
+                                var biasCount = Model.Analysis.Biases.Count;
+                                var angleStep = 360.0 / biasCount;
+
+                                for (int i = 0; i < biasCount; i++)
+                                {
+                                    var bias = Model.Analysis.Biases[i];
+                                    var angle = i * angleStep;
+                                    var radians = angle * Math.PI / 180;
+                                    var distance = 40 + (bias.Severity / 100.0 * 30);
+                                    var x = Math.Cos(radians) * distance;
+                                    var y = Math.Sin(radians) * distance;
+
+                                    <div class="bias-node @bias.GetSeverityClass()"
+                                         style="transform: translate(@x%, @y%)">
+                                        <div class="node-pulse"></div>
+                                        <span class="node-label">@bias.Type</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <!-- Detailed bias list -->
+                        <div class="bias-detailed-list">
+                            @foreach (var bias in Model.Analysis.Biases)
+                            {
+                                <div class="bias-detailed-card @bias.GetSeverityClass()">
+                                    <div class="bias-header">
+                                        <h3>@bias.Type</h3>
+                                        <div class="severity-badge">
+                                            <span class="severity-value">@bias.Severity%</span>
+                                            <span class="severity-label">Intensità</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="bias-body">
+                                        <p class="bias-explanation">@bias.Description</p>
+
+                                        @if (bias.Examples != null && bias.Examples.Any())
+                                        {
+                                            <div class="examples-section">
+                                                <h4><i class="bi bi-quote"></i> Esempi nell'articolo</h4>
+                                                <div class="examples-list">
+                                                    @foreach (var example in bias.Examples)
+                                                    {
+                                                        <div class="example-bubble">
+                                                            <p>@example</p>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="bias-info">
+                                            <h4><i class="bi bi-info-circle"></i> Come riconoscere questo bias</h4>
+                                            <p>@GetBiasLearningTip(bias.Type)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-bias-message">
+                            <div class="message-icon"><i class="bi bi-check-circle"></i></div>
+                            <h3>Nessun bias significativo rilevato</h3>
+                            <p>L'articolo analizzato non presenta bias cognitivi significativi secondo i nostri parametri di analisi.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Framing Tab -->
+            <div class="tab-pane fade" id="framing" role="tabpanel">
+                <div class="framing-explainer">
+                    <div class="explainer-icon">
+                        <i class="bi bi-bounding-box"></i>
+                    </div>
+                    <div class="explainer-content">
+                        <h2>Cos'è il framing?</h2>
+                        <p>Il framing è il modo in cui le informazioni vengono selezionate e presentate, determinando quali aspetti di una realtà complessa vengono evidenziati e quali omessi. È come una "cornice" che influenza significativamente l'interpretazione del lettore.</p>
+                    </div>
+                </div>
+
+                <div class="framing-main-section">
+                    <div class="framing-primary-container">
+                        <h3 class="section-title"><i class="bi bi-window"></i> Framing principale</h3>
+                        <div class="primary-frame-card">
+                            <div class="frame-decoration">
+                                <div class="frame-corner top-left"></div>
+                                <div class="frame-corner top-right"></div>
+                                <div class="frame-corner bottom-left"></div>
+                                <div class="frame-corner bottom-right"></div>
+                            </div>
+                            <div class="frame-content">
+                                <p>@Model.Analysis.PrimaryFraming</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.Analysis.FramingTechniques != null && Model.Analysis.FramingTechniques.Any())
+                {
+                    <div class="framing-techniques-section">
+                        <h3 class="section-title"><i class="bi bi-layers"></i> Tecniche di framing</h3>
+                        <div class="framing-techniques-grid">
+                            @foreach (var technique in Model.Analysis.FramingTechniques)
+                            {
+                                <div class="framing-technique-card">
+                                    <div class="technique-icon">
+                                        <i class="bi bi-exclude"></i>
+                                    </div>
+                                    <div class="technique-content">
+                                        <h4>Tecnica di framing</h4>
+                                        <p>@technique</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="key-terms-section">
+                    <h3 class="section-title"><i class="bi bi-tags"></i> Termini chiave</h3>
+                    <div class="terms-container">
+                        <div class="term-bubbles">
+                            @foreach (var term in Model.Analysis.KeyTerms ?? new List<string>())
+                            {
+                                <div class="term-bubble">
+                                    <span>@term</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="framing-effects">
+                    <div class="effect-card">
+                        <h3><i class="bi bi-lightbulb"></i> Come il framing influenza la percezione</h3>
+                        <p>Il framing selezionato in questo articolo tende a indirizzare il lettore verso una specifica interpretazione degli eventi, presentando alcuni aspetti come più rilevanti di altri e stabilendo implicitamente dei collegamenti causali.</p>
+                        <div class="framing-tips">
+                            <div class="tip">
+                                <div class="tip-icon"><i class="bi bi-eye"></i></div>
+                                <p>Cerca quali informazioni sono state enfatizzate e quali minimizzate</p>
+                            </div>
+                            <div class="tip">
+                                <div class="tip-icon"><i class="bi bi-chat-square-quote"></i></div>
+                                <p>Considera quali fonti e citazioni sono state selezionate</p>
+                            </div>
+                            <div class="tip">
+                                <div class="tip-icon"><i class="bi bi-justify"></i></div>
+                                <p>Rifletti su come i fatti sono stati contestualizzati e ordinati</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rhetoric Tab -->
+            <div class="tab-pane fade" id="rhetoric" role="tabpanel">
+                <div class="rhetoric-explainer">
+                    <div class="explainer-icon">
+                        <i class="bi bi-chat-quote"></i>
+                    </div>
+                    <div class="explainer-content">
+                        <h2>Tecniche retoriche e persuasive</h2>
+                        <p>Le tecniche retoriche sono strategie linguistiche che mirano a influenzare il pensiero e le emozioni del lettore. Non sono necessariamente negative, ma è importante riconoscerle per una lettura più consapevole.</p>
+                    </div>
+                </div>
+
+                @if (Model.Analysis.RhetoricTechniques != null && Model.Analysis.RhetoricTechniques.Any())
+                {
+                    <div class="rhetoric-techniques-detailed">
+                        @foreach (var technique in Model.Analysis.RhetoricTechniques)
+                        {
+                            <div class="rhetoric-detail-card">
+                                <div class="rhetoric-header">
+                                    <div class="rhetoric-icon">
+                                        <i class="@GetTechniqueIcon(technique.Name)"></i>
+                                    </div>
+                                    <h3>@technique.Name</h3>
+                                    <button class="expand-btn" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#rhetoric-@(technique.Name.Replace(" ", ""))">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="rhetoric-preview">
+                                    <p>@technique.Description</p>
+                                </div>
+                                <div class="collapse rhetoric-expanded" id="rhetoric-@(technique.Name.Replace(" ", ""))">
+                                    @if (technique.Examples != null && technique.Examples.Any())
+                                    {
+                                        <div class="examples-container">
+                                            <h4><i class="bi bi-quote"></i> Esempi nell'articolo</h4>
+                                            <div class="examples-list">
+                                                @foreach (var example in technique.Examples)
+                                                {
+                                                    <div class="example-quote">
+                                                        <div class="quote-bubble">
+                                                            <p>@example</p>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(technique.Effect))
+                                    {
+                                        <div class="effect-container">
+                                            <h4><i class="bi bi-person"></i> Effetto sul lettore</h4>
+                                            <p>@technique.Effect</p>
+                                        </div>
+                                    }
+
+                                    <div class="learn-more">
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-book"></i>
+                                            Approfondisci questa tecnica
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="rhetoric-learning-section">
+                        <h3><i class="bi bi-trophy"></i> Come riconoscere e valutare le tecniche retoriche</h3>
+                        <div class="learning-grid">
+                            <div class="learning-card">
+                                <div class="card-number">1</div>
+                                <h4>Fatti vs. Opinioni</h4>
+                                <p>Distingui le affermazioni oggettive da quelle che esprimono giudizi o punti di vista.</p>
+                            </div>
+                            <div class="learning-card">
+                                <div class="card-number">2</div>
+                                <h4>Appelli emotivi</h4>
+                                <p>Identifica le parole e le frasi che mirano a suscitare reazioni emotive piuttosto che razionali.</p>
+                            </div>
+                            <div class="learning-card">
+                                <div class="card-number">3</div>
+                                <h4>Fonti e autorità</h4>
+                                <p>Valuta come vengono utilizzati gli esperti e le fonti per sostenere le argomentazioni.</p>
+                            </div>
+                            <div class="learning-card">
+                                <div class="card-number">4</div>
+                                <h4>Selezione delle parole</h4>
+                                <p>Nota la scelta di termini con connotazione positiva o negativa per influenzare la percezione.</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data-message">
+                        <div class="message-icon"><i class="bi bi-check-circle"></i></div>
+                        <h3>Nessuna tecnica retorica significativa rilevata</h3>
+                        <p>L'articolo analizzato non presenta tecniche retoriche significative secondo i nostri parametri di analisi.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Alternatives Tab -->
+            <div class="tab-pane fade" id="alternatives" role="tabpanel">
+                <div class="alternatives-explainer">
+                    <div class="explainer-icon">
+                        <i class="bi bi-shuffle"></i>
+                    </div>
+                    <div class="explainer-content">
+                        <h2>Prospettive alternative</h2>
+                        <p>Ogni notizia può essere raccontata da diversi punti di vista. Questa sezione esplora come lo stesso argomento potrebbe essere presentato con inquadrature e prospettive diverse.</p>
+                    </div>
+                </div>
+
+                <div class="perspective-comparison-section">
+                    <div class="perspective-grid">
+                        <div class="perspective-card primary">
+                            <div class="perspective-header">
+                                <div class="header-icon">
+                                    <i class="bi bi-eye"></i>
+                                </div>
+                                <h3>Prospettiva dell'articolo</h3>
+                            </div>
+                            <div class="perspective-content">
+                                <div class="content-box">
+                                    <p>@Model.Analysis.PrimaryFraming</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="perspective-divider">
+                            <div class="divider-icon">
+                                <i class="bi bi-arrows-angle-expand"></i>
+                            </div>
+                        </div>
+
+                        <div class="perspective-card alternative">
+                            <div class="perspective-header">
+                                <div class="header-icon">
+                                    <i class="bi bi-binoculars"></i>
+                                </div>
+                                <h3>Prospettiva alternativa</h3>
+                            </div>
+                            <div class="perspective-content">
+                                <div class="content-box">
+                                    <p>@Model.Analysis.AlternativePerspective</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="counter-arguments-section">
+                    <h3 class="section-title"><i class="bi bi-arrow-return-right"></i> Controargomentazioni</h3>
+                    <p class="section-description">Argomentazioni che contrastano o mettono in discussione la narrativa principale dell'articolo:</p>
+
+                    @if (Model.Analysis.CounterArguments != null && Model.Analysis.CounterArguments.Any())
+                    {
+                        <div class="counter-arguments-grid">
+                            @foreach (var argument in Model.Analysis.CounterArguments)
+                            {
+                                <div class="counter-argument-card">
+                                    <div class="argument-icon">
+                                        <i class="bi bi-chat-left-text"></i>
+                                    </div>
+                                    <div class="argument-content">
+                                        <p>@argument</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Analysis.SynthesisPerspective))
+                        {
+                            <div class="synthesis-perspective">
+                                <h3><i class="bi bi-arrow-left-right"></i> Proposta di sintesi</h3>
+                                <div class="synthesis-content">
+                                    <p>@Model.Analysis.SynthesisPerspective</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-data-message">
+                            <i class="bi bi-info-circle"></i>
+                            <p>Nessuna controargomentazione significativa identificata</p>
+                        </div>
+                    }
+                </div>
+
+
+            </div>
+            <!-- Sources Tab -->
+            <div class="tab-pane fade" id="sources" role="tabpanel">
+                <div class="sources-explainer">
+                    <div class="explainer-icon">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <div class="explainer-content">
+                        <h2>Analisi delle fonti</h2>
+                        <p>Questa sezione esamina la qualità, varietà e affidabilità delle fonti utilizzate nell'articolo, oltre alla completezza informativa rispetto al tema trattato.</p>
+                    </div>
+                </div>
+
+                <div class="source-analysis-section">
+                    @if (Model.Analysis.SourceAnalysis != null)
+                    {
+                        <div class="source-quality-card">
+                            <h3><i class="bi bi-award"></i> Qualità delle fonti</h3>
+                            <p>@Model.Analysis.SourceAnalysis.Quality</p>
+
+                            <div class="source-scores">
+                                @if (Model.Analysis.Scores.FactualAccuracyScore > 0)
+                                {
+                                    <div class="source-score-item">
+                                        <span class="score-label">Accuratezza fattuale</span>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: @(Model.Analysis.Scores.FactualAccuracyScore)%"></div>
+                                        </div>
+                                        <span class="score-value">@Model.Analysis.Scores.FactualAccuracyScore%</span>
+                                    </div>
+                                }
+
+                                @if (Model.Analysis.Scores.SourceTransparencyScore > 0)
+                                {
+                                    <div class="source-score-item">
+                                        <span class="score-label">Trasparenza delle fonti</span>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: @(Model.Analysis.Scores.SourceTransparencyScore)%"></div>
+                                        </div>
+                                        <span class="score-value">@Model.Analysis.Scores.SourceTransparencyScore%</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="source-variety-card">
+                            <h3><i class="bi bi-grid-3x3"></i> Varietà delle fonti</h3>
+                            <p>@Model.Analysis.SourceAnalysis.Variety</p>
+                        </div>
+
+                        @if (Model.Analysis.SourceAnalysis.MissingPerspectives != null && Model.Analysis.SourceAnalysis.MissingPerspectives.Any())
+                        {
+                            <div class="missing-perspectives-card">
+                                <h3><i class="bi bi-eye-slash"></i> Prospettive mancanti</h3>
+                                <ul class="missing-list">
+                                    @foreach (var perspective in Model.Analysis.SourceAnalysis.MissingPerspectives)
+                                    {
+                                        <li><i class="bi bi-exclamation-circle"></i> @perspective</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-data-message">
+                            <div class="message-icon"><i class="bi bi-info-circle"></i></div>
+                            <h3>Analisi delle fonti non disponibile</h3>
+                            <p>Per questo articolo non è disponibile un'analisi dettagliata delle fonti.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Footer -->
+        <div class="analysis-footer">
+            <div class="footer-meta">
+                <div class="analysis-id">
+                    <i class="bi bi-fingerprint"></i>
+                    <span>ID: @Model.Analysis.AnalysisId?.Substring(0, 8)</span>
+                </div>
+                <div class="analysis-date">
+                    <i class="bi bi-clock"></i>
+                    <span>Analizzato il @Model.Analysis.AnalysisDate.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                <div class="prisma-branding">Powered by <span class="prisma-logo">Prisma<i class="bi bi-diamond-half"></i>News</span></div>
+            </div>
+
+            <div class="footer-actions">
+                <a href="/" class="btn btn-outline-primary">
+                    <i class="bi bi-house"></i>
+                    <span>Home</span>
+                </a>
+                <button class="btn btn-outline-primary">
+                    <i class="bi bi-file-pdf"></i>
+                    <span>Esporta PDF</span>
+                </button>
+                <button class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                    <span>Analizza altro</span>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/analysis.js" asp-append-version="true"></script>
+}
+
+@functions {
+    public string GetBiasLearningTip(string biasType)
+    {
+        return biasType switch
+        {
+            "Confirmation Bias" => "Cerca di identificare se l'articolo presenta solo prove che confermano la propria tesi, ignorando o minimizzando quelle contrarie.",
+            "Authority Bias" => "Fai attenzione quando l'articolo si basa principalmente sull'opinione di esperti o figure autorevoli senza presentare i dati sottostanti.",
+            "Selection Bias" => "Verifica se l'articolo seleziona strategicamente solo certe fonti o esempi che supportano la sua tesi principale.",
+            "Cherry Picking" => "Osserva se vengono selezionati solo dati o esempi favorevoli alla tesi dell'articolo, ignorando il contesto più ampio.",
+            "Framing Bias" => "Nota come il tema viene presentato e quale prospettiva viene privilegiata nella narrazione.",
+            "False Dichotomy" => "Osserva se l'articolo presenta artificialmente solo due opzioni estreme, ignorando soluzioni intermedie.",
+            "Appeal to Emotion" => "Rileva l'uso di linguaggio emotivamente carico per influenzare il giudizio piuttosto che presentare fatti obiettivi.",
+            "False Causality" => "Verifica se l'articolo stabilisce relazioni di causa-effetto tra eventi senza prove sufficienti.",
+            _ => "Osserva criticamente come le informazioni vengono selezionate e presentate, e quali prospettive potrebbero essere state omesse."
+        };
+    }
+
+    public string GetTechniqueIcon(string techniqueName)
+    {
+        return techniqueName.ToLower() switch
+        {
+            var t when t.Contains("autorità") || t.Contains("authority") => "bi bi-award",
+            var t when t.Contains("dicotomia") || t.Contains("dichotomy") => "bi bi-layout-split",
+            var t when t.Contains("apocalittico") || t.Contains("apocalyptic") => "bi bi-tsunami",
+            var t when t.Contains("statistic") => "bi bi-graph-up",
+            var t when t.Contains("gergo") || t.Contains("jargon") => "bi bi-code-slash",
+            var t when t.Contains("futurismo") || t.Contains("futurism") => "bi bi-rocket-takeoff",
+            var t when t.Contains("emotion") || t.Contains("emotiv") => "bi bi-heart",
+            var t when t.Contains("general") => "bi bi-people",
+            var t when t.Contains("iperbole") || t.Contains("hyperbol") => "bi bi-arrow-up-right-circle",
+            var t when t.Contains("metafora") || t.Contains("metaphor") => "bi bi-palette",
+            var t when t.Contains("ripetizion") || t.Contains("repetitiv") => "bi bi-arrow-repeat",
+            _ => "bi bi-chat-quote"
+        };
+    }
+}

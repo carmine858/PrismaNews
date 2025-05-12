@@ -1,0 +1,151 @@
+﻿@page
+@model Prisma.Pages.User.FavoritesModel
+@{
+    ViewData["Title"] = "Analisi Salvate";
+}
+
+<div class="container my-5">
+    <div class="favorites-header mb-4">
+        <h1><i class="bi bi-bookmark-star"></i> Le tue analisi salvate</h1>
+        <p class="lead text-muted">Qui puoi trovare tutte le analisi che hai salvato nei tuoi preferiti.</p>
+    </div>
+
+    @if (!Model.SavedAnalyses.Any())
+    {
+        <div class="empty-state text-center my-5 py-5">
+            <div class="empty-icon mb-3">
+                <i class="bi bi-bookmark-dash display-1 text-muted"></i>
+            </div>
+            <h2>Nessuna analisi salvata</h2>
+            <p class="lead text-muted mb-4">Non hai ancora salvato nessuna analisi nei preferiti.</p>
+            <a href="/" class="btn btn-primary">
+                <i class="bi bi-newspaper"></i>
+                Esplora le notizie
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var analysis in Model.SavedAnalyses)
+            {
+                <div class="col-lg-6 mb-4">
+                    <div class="card saved-analysis-card h-100">
+                        <div class="card-body">
+                            <div class="saved-date mb-2">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="text-muted">Salvato il @analysis.SavedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <h3 class="card-title">@analysis.ArticleTitle</h3>
+
+                            @if (analysis.Analysis != null)
+                            {
+                                <div class="analysis-preview mt-3">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="score-preview">
+                                                <div class="score-item">
+                                                    <span class="score-label">Bias</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar @GetBiasClass(analysis.Analysis.Scores.BiasScore)"
+                                                             role="progressbar"
+                                                             style="width: @analysis.Analysis.Scores.BiasScore%">
+                                                            @analysis.Analysis.Scores.BiasScore%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="score-item">
+                                                    <span class="score-label">Persuasione</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar @GetPersuasionClass(analysis.Analysis.Scores.PersuasionScore)"
+                                                             role="progressbar"
+                                                             style="width: @analysis.Analysis.Scores.PersuasionScore%">
+                                                            @analysis.Analysis.Scores.PersuasionScore%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="summary-preview">
+                                                <h5><i class="bi bi-text-paragraph"></i> Sintesi</h5>
+                                                <p class="text-truncate-3">@analysis.Analysis.Summary</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="@analysis.ArticleUrl" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                    Articolo originale
+                                </a>
+                                <a href="/Analysis/Analyze?articleId=@analysis.ArticleId" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i>
+                                    Visualizza analisi
+                                </a>
+                                <form method="post" asp-page-handler="DeleteSaved" onsubmit="return confirm('Vuoi davvero rimuovere questa analisi dai preferiti?');">
+                                    <input type="hidden" name="savedAnalysisId" value="@analysis.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@functions {
+    private string GetBiasClass(int score)
+    {
+        return score switch
+        {
+            >= 75 => "bg-danger",
+            >= 50 => "bg-warning",
+            _ => "bg-success"
+        };
+    }
+
+    private string GetPersuasionClass(int score)
+    {
+        return score switch
+        {
+            >= 75 => "bg-primary",
+            >= 50 => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Styles {
+    <style>
+        .saved-analysis-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+            .saved-analysis-card:hover {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-3px);
+            }
+
+        .text-truncate-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-height: 4.5em;
+        }
+
+        .empty-icon {
+            color: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+}

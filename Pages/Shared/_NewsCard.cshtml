@@ -1,0 +1,28 @@
+﻿@model Prisma.Models.NewsArticle
+
+<div class="news-card @(Model.IsFeatured ? "featured" : "") @(Model.IsTrending ? "trending" : "")">
+    <div class="card-image-container">
+        <img src="@(Model.ImageUrl ?? Model.GetPlaceholderImage())"
+             alt="@Model.Title"
+             class="card-image"
+             onerror="this.src='@Model.GetPlaceholderImage()'" />
+        <div class="card-overlay"></div>
+        <span class="category-pill @Model.GetSectionColor()">@Model.Section</span>
+    </div>
+    <div class="card-content">
+        <h4 class="card-title">@Model.Title</h4>
+        <p class="card-meta">
+            <span class="card-author"><i class="bi bi-person-circle"></i> @Model.Author</span>
+            <span class="card-date"><i class="bi bi-calendar3"></i> @Model.GetTimeAgo()</span>
+        </p>
+        <p class="card-excerpt">@Model.GetTruncatedSummary(100)</p>
+        <div class="card-actions">
+            <a href="/News/Analyze/@Model.Id" class="btn btn-primary btn-sm analyze-btn">
+                <i class="bi bi-layers"></i> <span>Decostruisci</span>
+            </a>
+            <a href="@Model.Url" target="_blank" class="btn btn-link btn-sm">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+    </div>
+</div>

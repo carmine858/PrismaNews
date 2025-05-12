@@ -1,0 +1,600 @@
+:root {
+    --primary-color: #3f51b5;
+    --primary-dark: #303f9f;
+    --primary-light: #c5cae9;
+    --accent-color: #ff4081;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --divider-color: #bdbdbd;
+    --background-dark: #121212;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --error-color: #FF5252;
+}
+
+/* Base Auth Styles */
+.auth-body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--background-dark);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+.auth-background {
+    position: relative;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow: hidden;
+}
+
+.auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(63, 81, 181, 0.85) 0%, rgba(33, 33, 33, 0.95) 100%);
+    z-index: 1;
+}
+
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Auth Card Styles */
+.auth-container {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    z-index: 10;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+    position: relative;
+}
+
+.card-body {
+    padding: 1.5rem 2rem 2rem;
+}
+
+.logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    height: 60px;
+    width: auto;
+}
+
+.auth-card h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.auth-card .highlight {
+    color: var(--primary-color);
+    position: relative;
+}
+
+.auth-card .highlight::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+    border-radius: 2px;
+}
+
+.tagline {
+    color: var(--text-secondary);
+    font-weight: 300;
+    margin-bottom: 1rem;
+}
+
+/* Form Styles */
+.floating-input {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.floating-input input {
+    width: 100%;
+    height: 56px;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: transparent;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.floating-input label {
+    position: absolute;
+    top: 50%;
+    left: 3rem;
+    transform: translateY(-50%);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    color: var(--text-secondary);
+}
+
+.floating-input input:focus,
+.floating-input input:not(:placeholder-shown) {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+}
+
+.floating-input input:focus + label,
+.floating-input input:not(:placeholder-shown) + label {
+    top: 9px;
+    left: 3rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.floating-input .icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.floating-input input:focus ~ .icon,
+.floating-input input:not(:placeholder-shown) ~ .icon {
+    color: var(--primary-color);
+}
+
+.floating-input .toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    cursor: pointer;
+    z-index: 10;
+}
+
+.floating-input .toggle-password:hover {
+    color: var(--primary-color);
+}
+
+/* Buttons */
+.btn {
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 6px rgba(63, 81, 181, 0.25);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 6px 8px rgba(63, 81, 181, 0.35);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+/* Remember me & Terms checkbox */
+.form-check {
+    padding-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: -2rem;
+    border: 2px solid var(--text-secondary);
+    border-radius: 4px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-label {
+    color: var(--text-secondary);
+}
+
+/* Password strength */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-meter {
+    height: 4px;
+    border-radius: 2px;
+    background: #e0e0e0;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.strength-meter::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-weak::before {
+    width: 33%;
+    background: var(--error-color);
+}
+
+.strength-medium::before {
+    width: 66%;
+    background: var(--warning-color);
+}
+
+.strength-strong::before {
+    width: 100%;
+    background: var(--success-color);
+}
+
+/* Additional actions */
+.additional-actions {
+    margin-top: 2rem;
+}
+
+.separator {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.separator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--divider-color);
+}
+
+.separator span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.btn-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.btn-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Footer */
+.auth-footer {
+    background: rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 15px 0;
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 10;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    display: flex;
+    align-items: center;
+}
+
+.alert-danger {
+    background-color: rgba(255, 82, 82, 0.1);
+    color: #D32F2F;
+}
+
+.alert i {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Success animation for confirmation */
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+}
+
+.check-icon {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 4px solid var(--success-color);
+}
+
+.check-icon::before {
+    top: 3px;
+    left: -2px;
+    width: 30px;
+    transform-origin: 100% 50%;
+    border-radius: 100px 0 0 100px;
+}
+
+.check-icon::after {
+    top: 0;
+    left: 30px;
+    width: 60px;
+    transform-origin: 0 50%;
+    border-radius: 0 100px 100px 0;
+    animation: rotate-circle 4.25s ease-in;
+}
+
+.check-icon::before, .check-icon::after {
+    content: '';
+    height: 100px;
+    position: absolute;
+    background: #FFFFFF;
+    transform: rotate(-45deg);
+}
+
+.icon-line {
+    height: 5px;
+    background-color: var(--success-color);
+    display: block;
+    border-radius: 2px;
+    position: absolute;
+    z-index: 10;
+}
+
+.icon-line.line-tip {
+    top: 46px;
+    left: 14px;
+    width: 25px;
+    transform: rotate(45deg);
+    animation: icon-line-tip 0.75s;
+}
+
+.icon-line.line-long {
+    top: 38px;
+    right: 8px;
+    width: 47px;
+    transform: rotate(-45deg);
+    animation: icon-line-long 0.75s;
+}
+
+.icon-circle {
+    top: -4px;
+    left: -4px;
+    z-index: 5;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: absolute;
+    box-sizing: content-box;
+    border: 4px solid rgba(76, 175, 80, 0.5);
+}
+
+.icon-fix {
+    top: 8px;
+    width: 5px;
+    left: 26px;
+    z-index: 1;
+    height: 85px;
+    position: absolute;
+    transform: rotate(-45deg);
+    background-color: #FFFFFF;
+}
+
+@keyframes rotate-circle {
+    0% {
+        transform: rotate(-45deg);
+    }
+    5% {
+        transform: rotate(-45deg);
+    }
+    12% {
+        transform: rotate(-405deg);
+    }
+    100% {
+        transform: rotate(-405deg);
+    }
+}
+
+@keyframes icon-line-tip {
+    0% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+    54% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+    70% {
+        width: 50px;
+        left: -8px;
+        top: 37px;
+    }
+    84% {
+        width: 17px;
+        left: 21px;
+        top: 48px;
+    }
+    100% {
+        width: 25px;
+        left: 14px;
+        top: 45px;
+    }
+}
+
+@keyframes icon-line-long {
+    0% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+    65% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+    84% {
+        width: 55px;
+        right: 0px;
+        top: 35px;
+    }
+    100% {
+        width: 47px;
+        right: 8px;
+        top: 38px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .auth-card {
+        margin: 0 1rem;
+    }
+    
+    .card-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem 1.5rem 1.5rem;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-links {
+        margin-top: 10px;
+    }
+    
+    .footer-links a {
+        margin: 0 0.5rem;
+    }
+}
+
+/* Confirmation card specific */
+.confirmation-card .confirmation-info {
+    text-align: center;
+    margin-bottom: 2rem;
+}

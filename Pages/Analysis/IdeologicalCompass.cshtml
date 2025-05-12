@@ -1,0 +1,431 @@
+﻿@page
+@model Prisma.Pages.Analysis.IdeologicalCompassModel
+@{
+    ViewData["Title"] = "Bussola Ideologica";
+}
+
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card compass-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-compass"></i> Bussola Ideologica
+                    </h1>
+
+                    @if (!string.IsNullOrEmpty(Model.ArticleTitle))
+                    {
+                        <span class="badge bg-primary">@Model.ArticleTitle</span>
+                    }
+                </div>
+
+                <div class="card-body">
+                    @if (Model.CurrentAnalysis != null)
+                    {
+                        <div class="compass-container">
+                            <div class="compass-wrapper">
+                                <div id="compass-chart-container">
+                                    <canvas id="compassChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="explanation-panel">
+                                <h4>Analisi dell'orientamento</h4>
+                                <div class="coordinates-display">
+                                    <div class="coordinate">
+                                        <span>Asse Economico:</span>
+                                        <span class="value @(Model.CurrentAnalysis.XAxis < 0 ? "right" : "left")">
+                                            @(Model.CurrentAnalysis.XAxis < 0 ? "Destra" : "Sinistra")
+                                            (@Math.Abs(Model.CurrentAnalysis.XAxis).ToString("F1"))
+                                        </span>
+                                    </div>
+                                    <div class="coordinate">
+                                        <span>Asse Sociale:</span>
+                                        <span class="value @(Model.CurrentAnalysis.YAxis < 0 ? "conservative" : "progressive")">
+                                            @(Model.CurrentAnalysis.YAxis < 0 ? "Conservatore" : "Progressista")
+                                            (@Math.Abs(Model.CurrentAnalysis.YAxis).ToString("F1"))
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="explanation-text">
+                                    <blockquote class="blockquote">
+                                        <p class="mb-0">@Model.CurrentAnalysis.Explanation</p>
+                                        <footer class="blockquote-footer text-end">Analisi generata da AI</footer>
+                                    </blockquote>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="@Url.Page("/Analysis/Analyze", new { articleId = Model.ArticleId })" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left"></i> Torna all'analisi completa
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-compass display-1 text-muted"></i>
+                            </div>
+                            <h3>Nessuna analisi ideologica disponibile</h3>
+                            <p class="text-muted">Seleziona un articolo e clicca su "Analizza ideologia" per visualizzare la bussola.</p>
+
+                            <a href="/" class="btn btn-primary mt-3">
+                                <i class="bi bi-newspaper"></i> Sfoglia articoli
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.RecentAnalyses.Any())
+            {
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4 class="mb-0">Analisi recenti</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Articolo</th>
+                                    <th>Fonte</th>
+                                    <th>Orientamento</th>
+                                    <th>Data</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var analysis in Model.RecentAnalyses)
+                                {
+                                    <tr>
+                                        <td>@analysis.ArticleTitle</td>
+                                        <td>@analysis.Source</td>
+                                        <td>
+                                            <span class="badge @GetOrientationClass(analysis)">
+                                                @GetOrientationLabel(analysis)
+                                            </span>
+                                        </td>
+                                        <td>@analysis.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <a href="@Url.Page("/Analysis/IdeologicalCompass", new { articleId = analysis.ArticleId })"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetOrientationClass(Prisma.Models.IdeologicalAnalysis analysis)
+    {
+        if (analysis.XAxis <= -2 && analysis.YAxis <= -2) return "bg-danger";
+        if (analysis.XAxis >= 2 && analysis.YAxis <= -2) return "bg-warning";
+        if (analysis.XAxis <= -2 && analysis.YAxis >= 2) return "bg-info";
+        if (analysis.XAxis >= 2 && analysis.YAxis >= 2) return "bg-success";
+        return "bg-secondary";
+    }
+
+    private string GetOrientationLabel(Prisma.Models.IdeologicalAnalysis analysis)
+    {
+        if (analysis.XAxis <= -2 && analysis.YAxis <= -2) return "Autoritario Destra";
+        if (analysis.XAxis >= 2 && analysis.YAxis <= -2) return "Autoritario Sinistra";
+        if (analysis.XAxis <= -2 && analysis.YAxis >= 2) return "Libertario Destra";
+        if (analysis.XAxis >= 2 && analysis.YAxis >= 2) return "Libertario Sinistra";
+        return "Centrista";
+    }
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <script>
+                       document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('Inizializzazione Bussola Ideologica...');
+
+                // Dati inizializzati da Razor ma convertiti in variabili JavaScript
+                const hasCurrentAnalysis = @(Model.CurrentAnalysis != null ? "true" : "false");
+
+                // Dati per il grafico
+                const currentAnalysis = {
+                    x: @(Model.CurrentAnalysis?.XAxis ?? 0),
+                    y: @(Model.CurrentAnalysis?.YAxis ?? 0),
+                    title: '@Html.Raw(Json.Serialize(Model.CurrentAnalysis?.ArticleTitle ?? ""))'
+                };
+
+                const otherAnalyses = @Html.Raw(Json.Serialize(Model.OtherAnalyses.Select(a => new
+            {
+                x = a.XAxis,
+                y = a.YAxis,
+                title = a.ArticleTitle,
+                id = a.ArticleId
+            }).ToList()));
+
+                // Ottieni il canvas
+                const ctx = document.getElementById('compassChart');
+                if (!ctx) {
+                    console.error('Canvas compassChart non trovato!');
+                    return;
+                }
+
+                // Assicurati che il contenitore abbia dimensioni adeguate
+                const container = document.getElementById('compass-chart-container');
+                if (container) {
+                    container.style.height = '500px';
+                    container.style.width = '100%';
+                    container.style.position = 'relative';
+                }
+
+                // Crea il grafico
+                const chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Articolo corrente',
+                                data: hasCurrentAnalysis ? [currentAnalysis] : [],
+                                backgroundColor: 'rgba(255, 0, 0, 1)', // Colore fisso invece di funzione
+                                borderColor: 'rgba(255, 0, 0, 1)',
+                                pointRadius: 12,
+                                pointHoverRadius: 14,
+                                pointStyle: 'circle'
+                            },
+                            {
+                                label: 'Altri articoli',
+                                data: otherAnalyses,
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)', // Colore fisso invece di funzione
+                                borderColor: 'rgba(54, 162, 235, 0.7)',
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                pointStyle: 'circle'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                min: -5,
+                                max: 5,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    lineWidth: 1,
+                                    drawBorder: true,
+                                    borderDash: [5, 5],
+                                    z: 1
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Destra ← → Sinistra',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value === 0) return 'Centro';
+                                        if (value < 0) return Math.abs(value);
+                                        return value;
+                                    }
+                                }
+                            },
+                            y: {
+                                min: -5,
+                                max: 5,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)',
+                                    lineWidth: 1,
+                                    drawBorder: true,
+                                    borderDash: [5, 5],
+                                    z: 1
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Conservatore ← → Progressista',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value === 0) return 'Centro';
+                                        if (value < 0) return Math.abs(value);
+                                        return value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const point = context.raw;
+                                        // Verifichiamo che point sia definito
+                                        if (!point) return "";
+                                        return point.title || `(${point.x.toFixed(1)}, ${point.y.toFixed(1)})`;
+                                    }
+                                },
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: {
+                                    size: 14
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                padding: 10
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeOutQuart'
+                        }
+                    },
+                    plugins: [{
+                        beforeDraw: function(chart) {
+                            const ctx = chart.ctx;
+                            const chartArea = chart.chartArea;
+                            const xAxis = chart.scales.x;
+                            const yAxis = chart.scales.y;
+
+                            // Verifichiamo che tutti gli elementi necessari siano definiti
+                            if (!ctx || !chartArea || !xAxis || !yAxis) return;
+
+                            // Disegna i quadranti
+                            ctx.save();
+
+                            // Quadrante in alto a destra (Libertario Sinistra)
+                            ctx.fillStyle = 'rgba(76, 175, 80, 0.1)';
+                            ctx.fillRect(
+                                xAxis.getPixelForValue(0),
+                                chartArea.top,
+                                chartArea.right - xAxis.getPixelForValue(0),
+                                yAxis.getPixelForValue(0) - chartArea.top
+                            );
+
+                            // Quadrante in alto a sinistra (Libertario Destra)
+                            ctx.fillStyle = 'rgba(33, 150, 243, 0.1)';
+                            ctx.fillRect(
+                                chartArea.left,
+                                chartArea.top,
+                                xAxis.getPixelForValue(0) - chartArea.left,
+                                yAxis.getPixelForValue(0) - chartArea.top
+                            );
+
+                            // Quadrante in basso a destra (Autoritario Sinistra)
+                            ctx.fillStyle = 'rgba(255, 152, 0, 0.1)';
+                            ctx.fillRect(
+                                xAxis.getPixelForValue(0),
+                                yAxis.getPixelForValue(0),
+                                chartArea.right - xAxis.getPixelForValue(0),
+                                chartArea.bottom - yAxis.getPixelForValue(0)
+                            );
+
+                            // Quadrante in basso a sinistra (Autoritario Destra)
+                            ctx.fillStyle = 'rgba(244, 67, 54, 0.1)';
+                            ctx.fillRect(
+                                chartArea.left,
+                                yAxis.getPixelForValue(0),
+                                xAxis.getPixelForValue(0) - chartArea.left,
+                                chartArea.bottom - yAxis.getPixelForValue(0)
+                            );
+
+                            // Etichette dei quadranti
+                            ctx.font = '14px Arial';
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                            ctx.textAlign = 'center';
+
+                            // Libertario Sinistra
+                            ctx.fillText(
+                                'Libertario Sinistra',
+                                (xAxis.getPixelForValue(0) + chartArea.right) / 2,
+                                chartArea.top + 20
+                            );
+
+                            // Libertario Destra
+                            ctx.fillText(
+                                'Libertario Destra',
+                                (chartArea.left + xAxis.getPixelForValue(0)) / 2,
+                                chartArea.top + 20
+                            );
+
+                            // Autoritario Sinistra
+                            ctx.fillText(
+                                'Autoritario Sinistra',
+                                (xAxis.getPixelForValue(0) + chartArea.right) / 2,
+                                chartArea.bottom - 10
+                            );
+
+                            // Autoritario Destra
+                            ctx.fillText(
+                                'Autoritario Destra',
+                                (chartArea.left + xAxis.getPixelForValue(0)) / 2,
+                                chartArea.bottom - 10
+                            );
+
+                            ctx.restore();
+                        }
+                    }]
+                });
+
+                // Aggiungiamo event listener per click
+                chart.canvas.addEventListener('click', function(e) {
+                    const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+                    if (points.length) {
+                        const point = points[0];
+                        if (point.datasetIndex === 1 && otherAnalyses[point.index]) { // Altri articoli
+                            const articleId = otherAnalyses[point.index].id;
+                            window.location.href = `/Analysis/IdeologicalCompass?articleId=${articleId}`;
+                        }
+                    }
+                });
+
+                // Animazione per evidenziare l'articolo corrente
+                if (hasCurrentAnalysis) {
+                    const animatePulse = function() {
+                        const dataset = chart.data.datasets[0];
+                        dataset.pointRadius = dataset.pointRadius === 12 ? 14 : 12;
+                        chart.update('none');
+                        requestAnimationFrame(animatePulse);
+                    };
+
+                    setTimeout(function() {
+                        requestAnimationFrame(animatePulse);
+                    }, 2000);
+                }
+
+                console.log('Bussola Ideologica inizializzata con successo');
+
+            } catch (error) {
+                console.error('Errore nell\'inizializzazione della Bussola Ideologica:', error);
+                document.getElementById('compass-chart-container').innerHTML =
+                    `<div class="alert alert-danger">
+                        <strong>Errore nell'inizializzazione del grafico:</strong> ${error.message}<br>
+                        <small>Controlla la console per ulteriori dettagli.</small>
+                    </div>`;
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ideologicalcompass.css" asp-append-version="true" />
+}

@@ -1,0 +1,48 @@
+﻿@model Prisma.Models.NewsCategoryGroup
+
+<div class="category-carousel" id="carousel-@Model.CategorySlug">
+    <div class="category-header @Model.GradientClass">
+        <div class="category-icon">
+            <i class="bi @Model.IconClass"></i>
+        </div>
+        <h3>@Model.CategoryName</h3>
+        <p>@Model.Description</p>
+    </div>
+
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            @foreach (var article in Model.Articles)
+            {
+                <div class="swiper-slide">
+                    <div class="news-card">
+                        <div class="card-image-container">
+                            <img src="@(article.ImageUrl ?? article.GetPlaceholderImage())"
+                                 alt="@article.Title"
+                                 class="card-image"
+                                 onerror="this.src='@article.GetPlaceholderImage()'" />
+                            <div class="card-overlay"></div>
+                            <span class="category-pill @article.GetSectionColor()">@article.Section</span>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">@article.Title</h4>
+                            <p class="card-meta">
+                                <span class="card-date"><i class="bi bi-calendar3"></i> @article.GetTimeAgo()</span>
+                            </p>
+                            <p class="card-excerpt">@article.GetTruncatedSummary(100)</p>
+                            <div class="card-actions">
+                                <a href="/News/Analyze/@article.Id" class="btn btn-primary btn-sm analyze-btn">
+                                    <i class="bi bi-layers"></i> Decostruisci
+                                </a>
+                                <a href="@article.Url" target="_blank" class="btn btn-link btn-sm">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>
